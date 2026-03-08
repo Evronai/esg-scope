@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carbon Intelligence — ESG Emissions Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Figtree:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#0C0F0E; --surface:#111615; --surface2:#161C1A;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+  --text:#E8EAE9; --muted:#6B7875; --faint:#1E2826;
+  --s1:#3ECF8E; --s1d:rgba(62,207,142,0.12); --s1g:rgba(62,207,142,0.25);
+  --s2:#4AADDE; --s2d:rgba(74,173,222,0.12);  --s2g:rgba(74,173,222,0.25);
+  --s3:#C084FC; --s3d:rgba(192,132,252,0.12); --s3g:rgba(192,132,252,0.25);
+  --gold:#C9A84C; --goldd:rgba(201,168,76,0.15);
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Figtree',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+  --r:6px; --rl:12px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;font-size:14px;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+.amb{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:.055}
+.o1{width:600px;height:600px;background:var(--s1);top:-200px;left:-100px}
+.o2{width:500px;height:500px;background:var(--s2);bottom:-200px;right:-100px}
+.o3{width:400px;height:400px;background:var(--s3);top:50%;left:50%;transform:translate(-50%,-50%)}
+.shell{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 2rem 6rem}
+
+/* HEADER */
+.hdr{padding:3.5rem 0 3rem;border-bottom:1px solid var(--border);margin-bottom:3rem;display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;animation:fu .7s ease both}
+.wm{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem}
+.wm-icon{width:32px;height:32px;border:1px solid var(--s1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.wm-txt{font-family:var(--fm);font-size:.7rem;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.hdr h1{font-family:var(--fd);font-size:clamp(2.4rem,5vw,3.6rem);font-weight:300;line-height:1.05;letter-spacing:-.02em}
+.hdr h1 em{font-style:italic;color:var(--s1)}
+.hdr-sub{margin-top:.75rem;color:var(--muted);font-size:.875rem;font-weight:300;max-width:420px;line-height:1.7}
+.tc-label{font-family:var(--fm);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;text-align:right}
+.tc-num{font-family:var(--fd);font-size:clamp(2.5rem,4vw,4rem);font-weight:300;line-height:1;color:var(--gold);transition:color .4s;text-align:right}
+.tc-unit{font-size:.75rem;color:var(--muted);margin-top:.3rem;font-family:var(--fm);text-align:right}
+.tc-rating{display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;padding:.3rem .8rem;border-radius:20px;font-size:.72rem;font-weight:500;letter-spacing:.04em;transition:background .4s,color .4s;background:var(--faint);color:var(--muted);float:right;clear:both}
+
+/* PILLS */
+.pills{display:flex;gap:1rem;margin-bottom:2.5rem;animation:fu .7s .1s ease both}
+.pill{flex:1;padding:1.2rem 1.5rem;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);position:relative;overflow:hidden;transition:border-color .2s,transform .2s;cursor:default}
+.pill:hover{transform:translateY(-2px)}
+.pill::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.pill.s1::before{background:var(--s1)} .pill.s2::before{background:var(--s2)} .pill.s3::before{background:var(--s3)}
+.pill.s1{border-color:rgba(62,207,142,.2)} .pill.s2{border-color:rgba(74,173,222,.2)} .pill.s3{border-color:rgba(192,132,252,.2)}
+.ptag{font-family:var(--fm);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem}
+.s1 .ptag{color:var(--s1)} .s2 .ptag{color:var(--s2)} .s3 .ptag{color:var(--s3)}
+.pname{font-size:.9rem;font-weight:500;margin-bottom:.2rem}
+.pdesc{font-size:.75rem;color:var(--muted);line-height:1.5}
+.ptot{font-family:var(--fd);font-size:1.6rem;font-weight:300;margin-top:.8rem;line-height:1}
+.s1 .ptot{color:var(--s1)} .s2 .ptot{color:var(--s2)} .s3 .ptot{color:var(--s3)}
+.punit{font-family:var(--fm);font-size:.62rem;color:var(--muted);margin-left:.3rem}
+
+/* SECTIONS */
+.sec{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:1.5rem;overflow:hidden;animation:fu .6s ease both;transition:border-color .2s}
+.sec:nth-child(1){animation-delay:.15s} .sec:nth-child(2){animation-delay:.25s} .sec:nth-child(3){animation-delay:.35s}
+.sec.s1:hover{border-color:rgba(62,207,142,.25)} .sec.s2:hover{border-color:rgba(74,173,222,.25)} .sec.s3:hover{border-color:rgba(192,132,252,.25)}
+.sec-head{display:flex;align-items:center;gap:1.25rem;padding:1.4rem 2rem;cursor:pointer;user-select:none;border-bottom:1px solid transparent;transition:background .15s,border-color .2s}
+.sec-head:hover{background:rgba(255,255,255,.02)}
+.sec.open .sec-head{border-bottom-color:var(--border)}
+.sicon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-weight:500;font-size:.7rem;letter-spacing:.05em;flex-shrink:0}
+.s1 .sicon{background:var(--s1d);color:var(--s1);border:1px solid rgba(62,207,142,.2)}
+.s2 .sicon{background:var(--s2d);color:var(--s2);border:1px solid rgba(74,173,222,.2)}
+.s3 .sicon{background:var(--s3d);color:var(--s3);border:1px solid rgba(192,132,252,.2)}
+.smeta{flex:1}
+.smeta h2{font-size:.95rem;font-weight:600;letter-spacing:.01em}
+.smeta p{font-size:.78rem;color:var(--muted);margin-top:.1rem}
+.sfig{font-family:var(--fd);font-size:1.6rem;font-weight:300;line-height:1}
+.s1 .sfig{color:var(--s1)} .s2 .sfig{color:var(--s2)} .s3 .sfig{color:var(--s3)}
+.sfig-u{font-family:var(--fm);font-size:.62rem;color:var(--muted);margin-left:.25rem}
+.chev{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.7rem;transition:transform .3s,background .2s;flex-shrink:0}
+.sec.open .chev{transform:rotate(180deg);background:var(--faint)}
+.sec-body{display:none;padding:.5rem 0}
+.sec.open .sec-body{display:block}
+
+/* INPUT ROWS */
+.irow{display:grid;grid-template-columns:1fr 220px 120px;align-items:center;gap:1.5rem;padding:1.1rem 2rem;border-bottom:1px solid var(--border);transition:background .12s}
+.irow:last-child{border-bottom:none}
+.irow:hover{background:rgba(255,255,255,.015)}
+.rl-name{font-size:.875rem;font-weight:500}
+.rl-hint{font-size:.73rem;color:var(--muted);margin-top:.15rem;line-height:1.4}
+.rinput{display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.rinput:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px var(--goldd)}
+.rinput input{flex:1;background:none;border:none;outline:none;padding:.6rem .9rem;font-family:var(--fm);font-size:.88rem;color:var(--text);text-align:right;width:100%;min-width:0}
+.rinput input::placeholder{color:var(--muted);opacity:.5}
+.runit{padding:.6rem .75rem;font-family:var(--fm);font-size:.65rem;color:var(--muted);background:var(--faint);border-left:1px solid var(--border);white-space:nowrap;line-height:1}
+.rres{text-align:right;font-family:var(--fm);font-size:.8rem;color:var(--muted);transition:color .2s}
+.rres.on{color:var(--text)}
+
+/* DIST BAR */
+.dist{margin:2.5rem 0;animation:fu .6s .4s ease both}
+.dl{font-family:var(--fm);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.9rem}
+.dtrack{height:6px;background:var(--faint);border-radius:10px;overflow:hidden;display:flex}
+.dseg{height:100%;transition:width .6s cubic-bezier(.4,0,.2,1);min-width:0}
+.dseg.s1{background:var(--s1)} .dseg.s2{background:var(--s2)} .dseg.s3{background:var(--s3)}
+.dleg{display:flex;gap:2rem;margin-top:.9rem}
+.di{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--muted)}
+.ddot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ddot.s1{background:var(--s1)} .ddot.s2{background:var(--s2)} .ddot.s3{background:var(--s3)}
+.dpct{font-family:var(--fm);font-weight:500}
+
+/* ACTIONS */
+.acts{display:flex;gap:1rem;margin-top:1.5rem;animation:fu .6s .5s ease both}
+.btn{display:inline-flex;align-items:center;gap:.6rem;padding:.8rem 1.8rem;border-radius:var(--r);font-family:var(--fb);font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.01em;border:none}
+.btn-p{background:var(--s1);color:#0C0F0E}
+.btn-p:hover{background:#5DF0A8;transform:translateY(-1px);box-shadow:0 8px 24px var(--s1g)}
+.btn-s{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}
+.btn-s:hover{background:var(--faint);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)!important}
+
+/* DISCLAIMER */
+.disc{margin-top:2.5rem;padding:1.2rem 1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);display:flex;gap:1rem;align-items:flex-start;animation:fu .6s .55s ease both}
+.disc-icon{width:28px;height:28px;border-radius:50%;background:var(--faint);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;margin-top:.1rem}
+.disc p{font-size:.78rem;color:var(--muted);line-height:1.6}
+.disc strong{color:var(--text)}
+
+/* MODAL */
+.ovl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;padding:1.5rem}
+.ovl.open{display:flex;animation:fi .2s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+@keyframes su{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rl);max-width:680px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 40px 80px rgba(0,0,0,.6);animation:su .3s ease}
+.mhead{padding:2rem 2.5rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:var(--surface);z-index:1}
+.mhead h2{font-family:var(--fd);font-size:1.8rem;font-weight:300;line-height:1.1}
+.mhead h2 em{font-style:italic;color:var(--gold)}
+.mhead p{font-size:.78rem;color:var(--muted);margin-top:.3rem}
+.mclose{background:var(--faint);border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;transition:background .2s,color .2s}
+.mclose:hover{background:var(--s1d);color:var(--s1)}
+.mbody{padding:2rem 2.5rem}
+.rblock{margin-bottom:2.5rem}
+.rblock:last-child{margin-bottom:0}
+.rbtitle{font-family:var(--fm);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding-bottom:.75rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.5rem}
+.scard{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem}
+.sc-label{font-family:var(--fm);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+.sc-val{font-family:var(--fd);font-size:2rem;font-weight:300;line-height:1}
+.scard.tot .sc-val{color:var(--gold)} .scard.s1 .sc-val{color:var(--s1)} .scard.s2 .sc-val{color:var(--s2)} .scard.s3 .sc-val{color:var(--s3)}
+.sc-unit{font-family:var(--fm);font-size:.65rem;color:var(--muted);margin-top:.3rem}
+.rline{display:flex;justify-content:space-between;align-items:baseline;padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.84rem}
+.rline:last-child{border-bottom:none}
+.rline .rln{color:var(--muted)} .rline .rlv{font-family:var(--fm);font-size:.78rem;color:var(--text)}
+.rec{background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--gold);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.75rem}
+.rec:last-child{margin-bottom:0}
+.rec-s{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem}
+.rec-t{font-size:.84rem;line-height:1.6}
+.mnote{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;font-size:.78rem;color:var(--muted);line-height:1.7}
+.mnote strong{color:var(--text)}
+
+/* ANIM */
+@keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--faint);border-radius:10px}
+/* Hide print-only elements on screen */
+.no-screen{display:none}
+
+@media(max-width:680px){
+  .pills{flex-direction:column}
+  .hdr{flex-direction:column;align-items:flex-start}
+  .irow{grid-template-columns:1fr;gap:.6rem}
+  .rres{text-align:left}
+  .acts{flex-direction:column}
+  .sgrid{grid-template-columns:1fr 1fr}
+  .tc-label,.tc-num,.tc-unit,.tc-rating{text-align:left;float:none}
+}
+
+/* =====================================================
+   PRINT / PDF STYLES
+   ===================================================== */
+@media print {
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+  /* Reset to white paper */
+  :root{
+    --bg:#fff;--surface:#fff;--surface2:#f7f7f5;
+    --border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.15);
+    --text:#111;--muted:#666;--faint:#f0f0ee;
+    --s1:#1a7a52;--s1d:rgba(26,122,82,.08);
+    --s2:#1565a0;--s2d:rgba(21,101,160,.08);
+    --s3:#6b21a8;--s3d:rgba(107,33,168,.08);
+    --gold:#8a6a1a;--goldd:rgba(138,106,26,.1);
+    --fd:'Cormorant Garamond',Georgia,serif;
+    --fb:'Figtree',sans-serif;
+    --fm:'JetBrains Mono',monospace;
+  }
+
+  html,body{background:#fff!important;color:#111!important;font-size:11pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body::before{display:none}
+
+  /* Hide interactive UI */
+  .amb,.acts,.disc,.ovl,
+  .chev,.sec-head .chev,
+  .rinput,.rres,
+  .btn,
+  .no-print{display:none!important}
+
+  /* Show print-only elements */
+  .no-screen{display:inline!important}
+
+  .shell{max-width:100%;padding:0;margin:0}
+
+  /* HEADER */
+  .hdr{
+    padding:0 0 1.2rem;margin-bottom:1.4rem;
+    border-bottom:2px solid #1a7a52;
+    display:flex;align-items:flex-start;justify-content:space-between;
+    page-break-after:avoid;
+  }
+  .wm-icon{border-color:#1a7a52}
+  .wm-txt{color:#666}
+  .hdr h1{font-size:26pt;color:#111}
+  .hdr h1 em{color:#1a7a52}
+  .hdr-sub{color:#555;font-size:9pt;max-width:340px}
+  .tc-label{color:#666;text-align:right}
+  .tc-num{font-size:28pt;color:#8a6a1a;text-align:right}
+  .tc-unit{color:#666;text-align:right}
+  .tc-rating{
+    float:right;clear:both;margin-top:.4rem;
+    padding:.25rem .7rem;border-radius:20px;
+    font-size:8pt;border:1px solid currentColor;
+    background:#fff!important;
+  }
+
+  /* PILLS */
+  .pills{
+    display:flex;gap:.6rem;margin-bottom:1.2rem;
+    page-break-inside:avoid;
+  }
+  .pill{
+    flex:1;padding:.9rem 1rem;
+    border-radius:4px;border:1px solid rgba(0,0,0,.12)!important;
+    background:#f9f9f7!important;
+    position:relative;overflow:hidden;
+  }
+  .pill::before{height:3px!important}
+  .pill.s1::before{background:#1a7a52}
+  .pill.s2::before{background:#1565a0}
+  .pill.s3::before{background:#6b21a8}
+  .ptag{font-size:6.5pt;letter-spacing:.1em}
+  .s1 .ptag{color:#1a7a52} .s2 .ptag{color:#1565a0} .s3 .ptag{color:#6b21a8}
+  .pname{font-size:9pt}
+  .pdesc{font-size:8pt;color:#666}
+  .ptot{font-size:16pt;margin-top:.5rem}
+  .s1 .ptot{color:#1a7a52} .s2 .ptot{color:#1565a0} .s3 .ptot{color:#6b21a8}
+  .punit{font-size:7pt;color:#888}
+
+  /* SECTIONS */
+  .sec{
+    border:1px solid rgba(0,0,0,.1)!important;
+    border-radius:4px;
+    margin-bottom:.9rem;
+    page-break-inside:avoid;
+    background:#fff!important;
+  }
+  .sec.s1{border-top:2px solid #1a7a52!important}
+  .sec.s2{border-top:2px solid #1565a0!important}
+  .sec.s3{border-top:2px solid #6b21a8!important}
+
+  .sec-head{
+    padding:.75rem 1rem;border-bottom:1px solid rgba(0,0,0,.08)!important;
+    display:flex;align-items:center;gap:.75rem;
+    cursor:default;
+  }
+  .s1 .sicon{background:rgba(26,122,82,.08)!important;color:#1a7a52!important;border-color:rgba(26,122,82,.2)!important}
+  .s2 .sicon{background:rgba(21,101,160,.08)!important;color:#1565a0!important;border-color:rgba(21,101,160,.2)!important}
+  .s3 .sicon{background:rgba(107,33,168,.08)!important;color:#6b21a8!important;border-color:rgba(107,33,168,.2)!important}
+  .smeta h2{font-size:10pt;color:#111}
+  .smeta p{font-size:8pt;color:#666}
+  .s1 .sfig{color:#1a7a52} .s2 .sfig{color:#1565a0} .s3 .sfig{color:#6b21a8}
+  .sfig{font-size:14pt}
+  .sfig-u{font-size:7pt;color:#888}
+
+  /* Always show section body when printing */
+  .sec-body{display:block!important;padding:0}
+
+  /* PRINT-ONLY data rows (replacing interactive inputs) */
+  .irow{
+    display:flex!important;
+    justify-content:space-between;
+    align-items:center;
+    padding:.5rem 1rem;
+    border-bottom:1px solid rgba(0,0,0,.05)!important;
+    gap:0;
+  }
+  .irow:last-child{border-bottom:none!important}
+  .rl-name{font-size:8.5pt;color:#222;flex:1}
+  .rl-hint{font-size:7pt;color:#888}
+
+  /* Print value cells */
+  .pv-input{font-family:var(--fm);font-size:8pt;color:#333;text-align:right;min-width:90px}
+  .pv-result{font-family:var(--fm);font-size:8pt;font-weight:500;text-align:right;min-width:90px;padding-left:1rem}
+  .pv-result.s1c{color:#1a7a52} .pv-result.s2c{color:#1565a0} .pv-result.s3c{color:#6b21a8}
+
+  /* DISTRIBUTION BAR */
+  .dist{margin:1rem 0;page-break-inside:avoid}
+  .dl{font-size:7pt;color:#888;margin-bottom:.5rem}
+  .dtrack{height:8px;background:#eee!important;border-radius:4px}
+  .dseg.s1{background:#1a7a52!important}
+  .dseg.s2{background:#1565a0!important}
+  .dseg.s3{background:#6b21a8!important}
+  .dleg{gap:1.5rem;margin-top:.5rem}
+  .di{font-size:8pt}
+  .ddot.s1{background:#1a7a52!important} .ddot.s2{background:#1565a0!important} .ddot.s3{background:#6b21a8!important}
+  .dpct{font-size:8pt}
+  #pct-s1{color:#1a7a52!important} #pct-s2{color:#1565a0!important} #pct-s3{color:#6b21a8!important}
+
+  /* PRINT FOOTER */
+  .print-footer{
+    display:block!important;
+    margin-top:1.5rem;
+    padding-top:1rem;
+    border-top:1px solid rgba(0,0,0,.1);
+    font-size:7.5pt;
+    color:#888;
+    line-height:1.6;
+  }
+  .print-footer strong{color:#444}
+
+  /* Page settings */
+  @page{
+    size:A4;
+    margin:15mm 16mm 18mm;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="amb">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+
+<div class="shell">
+
+  <header class="hdr">
+    <div>
+      <div class="wm">
+        <div class="wm-icon">🌿</div>
+        <span class="wm-txt">Carbon Intelligence</span>
+      </div>
+      <h1>Measure Your<br><em>Carbon Footprint</em></h1>
+      <p class="hdr-sub">A Scope 1, 2 &amp; 3 emissions calculator for small and medium businesses. Enter your annual activity data to quantify your environmental impact.</p>
+    </div>
+    <div>
+      <div class="tc-label">Total Footprint</div>
+      <div class="tc-num" id="total-big">0.0</div>
+      <div class="tc-unit">tCO₂e / year</div>
+      <div class="tc-rating" id="rating-badge">No data entered</div>
+    </div>
+  </header>
+
+  <div class="pills">
+    <div class="pill s1">
+      <div class="ptag">Scope 1</div>
+      <div class="pname">Direct Emissions</div>
+      <div class="pdesc">Fuel you burn, vehicles you own, on-site processes</div>
+      <div class="ptot" id="pill-s1">0.0 <span class="punit">tCO₂e</span></div>
+    </div>
+    <div class="pill s2">
+      <div class="ptag">Scope 2</div>
+      <div class="pname">Purchased Energy</div>
+      <div class="pdesc">Electricity &amp; heat bought from external providers</div>
+      <div class="ptot" id="pill-s2">0.0 <span class="punit">tCO₂e</span></div>
+    </div>
+    <div class="pill s3">
+      <div class="ptag">Scope 3</div>
+      <div class="pname">Value Chain</div>
+      <div class="pdesc">Supply chain, travel, freight, waste &amp; more</div>
+      <div class="ptot" id="pill-s3">0.0 <span class="punit">tCO₂e</span></div>
+    </div>
+  </div>
+
+  <!-- SCOPE 1 -->
+  <div class="sec s1 open" id="sec1">
+    <div class="sec-head" onclick="tog('sec1')">
+      <div class="sicon">S1</div>
+      <div class="smeta">
+        <h2>Scope 1 — Direct Emissions</h2>
+        <p>Combustion, company fleet, refrigerant leaks</p>
+      </div>
+      <div class="sfig"><span id="fig-s1">0.0</span><span class="sfig-u">tCO₂e</span></div>
+      <div class="chev">▾</div>
+    </div>
+    <div class="sec-body">
+      <div class="irow">
+        <div><div class="rl-name">Natural Gas</div><div class="rl-hint">Heating, cooking, hot water — from your gas bill</div></div>
+        <div class="rinput"><input type="number" id="s1_gas" placeholder="0" min="0" oninput="calc()"><div class="runit">m³ / yr</div></div>
+        <div class="rres" id="r_s1_gas">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Diesel — Company Vehicles</div><div class="rl-hint">Litres for owned or leased diesel fleet</div></div>
+        <div class="rinput"><input type="number" id="s1_diesel" placeholder="0" min="0" oninput="calc()"><div class="runit">litres / yr</div></div>
+        <div class="rres" id="r_s1_diesel">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Petrol — Company Vehicles</div><div class="rl-hint">Litres for owned or leased petrol fleet</div></div>
+        <div class="rinput"><input type="number" id="s1_petrol" placeholder="0" min="0" oninput="calc()"><div class="runit">litres / yr</div></div>
+        <div class="rres" id="r_s1_petrol">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">LPG / Propane</div><div class="rl-hint">Cooking, heating or industrial processes</div></div>
+        <div class="rinput"><input type="number" id="s1_lpg" placeholder="0" min="0" oninput="calc()"><div class="runit">litres / yr</div></div>
+        <div class="rres" id="r_s1_lpg">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Refrigerant Top-up (R-410A)</div><div class="rl-hint">Leaked/replaced refrigerant — AC units, cold storage</div></div>
+        <div class="rinput"><input type="number" id="s1_refrig" placeholder="0" min="0" oninput="calc()"><div class="runit">kg / yr</div></div>
+        <div class="rres" id="r_s1_refrig">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCOPE 2 -->
+  <div class="sec s2 open" id="sec2">
+    <div class="sec-head" onclick="tog('sec2')">
+      <div class="sicon">S2</div>
+      <div class="smeta">
+        <h2>Scope 2 — Purchased Energy</h2>
+        <p>Grid electricity, district heating, steam</p>
+      </div>
+      <div class="sfig"><span id="fig-s2">0.0</span><span class="sfig-u">tCO₂e</span></div>
+      <div class="chev">▾</div>
+    </div>
+    <div class="sec-body">
+      <div class="irow">
+        <div><div class="rl-name">Electricity Consumed</div><div class="rl-hint">Total kWh from your electricity bill(s)</div></div>
+        <div class="rinput"><input type="number" id="s2_elec" placeholder="0" min="0" oninput="calc()"><div class="runit">kWh / yr</div></div>
+        <div class="rres" id="r_s2_elec">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Renewable Offset (solar / REGOs)</div><div class="rl-hint">kWh self-generated or certified renewable — deducted</div></div>
+        <div class="rinput"><input type="number" id="s2_renew" placeholder="0" min="0" oninput="calc()"><div class="runit">kWh / yr</div></div>
+        <div class="rres" id="r_s2_renew">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">District Heating / Steam</div><div class="rl-hint">Purchased heat from a centralised network</div></div>
+        <div class="rinput"><input type="number" id="s2_heat" placeholder="0" min="0" oninput="calc()"><div class="runit">kWh / yr</div></div>
+        <div class="rres" id="r_s2_heat">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCOPE 3 -->
+  <div class="sec s3 open" id="sec3">
+    <div class="sec-head" onclick="tog('sec3')">
+      <div class="sicon">S3</div>
+      <div class="smeta">
+        <h2>Scope 3 — Value Chain Emissions</h2>
+        <p>Travel, freight, waste, supply chain, commuting</p>
+      </div>
+      <div class="sfig"><span id="fig-s3">0.0</span><span class="sfig-u">tCO₂e</span></div>
+      <div class="chev">▾</div>
+    </div>
+    <div class="sec-body">
+      <div class="irow">
+        <div><div class="rl-name">Short-haul Flights</div><div class="rl-hint">Passenger km per year — under 3,700 km</div></div>
+        <div class="rinput"><input type="number" id="s3_flight_s" placeholder="0" min="0" oninput="calc()"><div class="runit">pkm / yr</div></div>
+        <div class="rres" id="r_s3_flight_s">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Long-haul Flights</div><div class="rl-hint">Passenger km per year — over 3,700 km</div></div>
+        <div class="rinput"><input type="number" id="s3_flight_l" placeholder="0" min="0" oninput="calc()"><div class="runit">pkm / yr</div></div>
+        <div class="rres" id="r_s3_flight_l">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Employee Commuting</div><div class="rl-hint">Total km driven by all staff per year</div></div>
+        <div class="rinput"><input type="number" id="s3_commute" placeholder="0" min="0" oninput="calc()"><div class="runit">km / yr</div></div>
+        <div class="rres" id="r_s3_commute">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Road Freight</div><div class="rl-hint">Tonne-km shipped (cargo weight × distance)</div></div>
+        <div class="rinput"><input type="number" id="s3_freight" placeholder="0" min="0" oninput="calc()"><div class="runit">tkm / yr</div></div>
+        <div class="rres" id="r_s3_freight">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Waste to Landfill</div><div class="rl-hint">Tonnes of general waste sent to landfill annually</div></div>
+        <div class="rinput"><input type="number" id="s3_waste" placeholder="0" min="0" oninput="calc()"><div class="runit">t / yr</div></div>
+        <div class="rres" id="r_s3_waste">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Hotel Stays</div><div class="rl-hint">Total business accommodation nights across all staff</div></div>
+        <div class="rinput"><input type="number" id="s3_hotel" placeholder="0" min="0" oninput="calc()"><div class="runit">nights / yr</div></div>
+        <div class="rres" id="r_s3_hotel">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Purchased Goods &amp; Services</div><div class="rl-hint">Annual spend on manufactured goods (spend-based method)</div></div>
+        <div class="rinput"><input type="number" id="s3_goods" placeholder="0" min="0" oninput="calc()"><div class="runit">£k / yr</div></div>
+        <div class="rres" id="r_s3_goods">—</div>
+      </div>
+      <div class="irow">
+        <div><div class="rl-name">Water Consumed</div><div class="rl-hint">m³ supplied and treated — from water bills</div></div>
+        <div class="rinput"><input type="number" id="s3_water" placeholder="0" min="0" oninput="calc()"><div class="runit">m³ / yr</div></div>
+        <div class="rres" id="r_s3_water">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISTRIBUTION -->
+  <div class="dist">
+    <div class="dl">Emissions Distribution</div>
+    <div class="dtrack">
+      <div class="dseg s1" id="bar-s1" style="width:0%"></div>
+      <div class="dseg s2" id="bar-s2" style="width:0%"></div>
+      <div class="dseg s3" id="bar-s3" style="width:0%"></div>
+    </div>
+    <div class="dleg">
+      <div class="di"><div class="ddot s1"></div><span>Scope 1</span><span class="dpct" id="pct-s1" style="color:var(--s1)">0%</span></div>
+      <div class="di"><div class="ddot s2"></div><span>Scope 2</span><span class="dpct" id="pct-s2" style="color:var(--s2)">0%</span></div>
+      <div class="di"><div class="ddot s3"></div><span>Scope 3</span><span class="dpct" id="pct-s3" style="color:var(--s3)">0%</span></div>
+    </div>
+  </div>
+
+  <div class="acts">
+    <button class="btn btn-p" onclick="showReport()"><span>↗</span> Generate Report</button>
+    <button class="btn btn-s" onclick="printPDF()"><span>⬇</span> Download PDF</button>
+    <button class="btn btn-s" onclick="resetAll()"><span>↺</span> Reset All</button>
+  </div>
+
+  <div class="disc">
+    <div class="disc-icon">ℹ</div>
+    <p>Results are estimates using <strong>UK Government GHG Conversion Factors</strong> and <strong>IPCC AR6 GWP values</strong>. UK grid electricity factor: 0.233 kgCO₂e/kWh. For formal ESG disclosure, CDP submission, or CSRD compliance, engage a certified sustainability consultant and use verified emission factors.</p>
+  </div>
+
+  <!-- Print-only footer -->
+  <div class="print-footer" style="display:none">
+    <strong>Methodology:</strong> Emission factors from the UK Government GHG Conversion Factor repository (2023) and IPCC AR6 GWP values.
+    UK grid electricity: 0.233 kgCO<sub>2</sub>e/kWh. R-410A refrigerant GWP: 2,088. Scope 3 spend-based estimates use EXIOBASE sector averages.
+    Results are indicative estimates. For formal ESG disclosure, CDP submission or CSRD compliance, third-party verification and
+    sector-specific emission factors are recommended. &nbsp;·&nbsp; Generated by Carbon Intelligence &nbsp;·&nbsp; <span id="print-date"></span>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="ovl" id="modal">
+  <div class="modal">
+    <div class="mhead">
+      <div>
+        <h2>Emissions <em>Summary Report</em></h2>
+        <p id="report-meta"></p>
+      </div>
+      <button class="mclose" onclick="closeModal()">✕</button>
+    </div>
+    <div class="mbody" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const EF={s1_gas:2.04,s1_diesel:2.67,s1_petrol:2.31,s1_lpg:1.51,s1_refrig:2088,s2_elec:.233,s2_renew:.233,s2_heat:.18,s3_flight_s:.255,s3_flight_l:.195,s3_commute:.14,s3_freight:.062,s3_waste:458,s3_hotel:31.2,s3_goods:350,s3_water:.344};
+const LBL={s1_gas:'Natural Gas',s1_diesel:'Diesel (fleet)',s1_petrol:'Petrol (fleet)',s1_lpg:'LPG/Propane',s1_refrig:'Refrigerants',s2_elec:'Grid Electricity',s2_renew:'Renewable Offset',s2_heat:'District Heating',s3_flight_s:'Short-haul Flights',s3_flight_l:'Long-haul Flights',s3_commute:'Employee Commuting',s3_freight:'Road Freight',s3_waste:'Landfill Waste',s3_hotel:'Hotel Stays',s3_goods:'Purchased Goods',s3_water:'Water'};
+let V={},T={S1:0,S2:0,S3:0,TOTAL:0};
+const gv=id=>Math.max(0,parseFloat(document.getElementById(id)?.value)||0);
+const fmt=n=>n>=100?n.toFixed(1):n.toFixed(2);
+const fmtB=n=>n>=1000?(n/1000).toFixed(1)+'k':n>=100?n.toFixed(0):n.toFixed(1);
+
+function calc(){
+  V={
+    s1_gas:gv('s1_gas')*EF.s1_gas/1000,s1_diesel:gv('s1_diesel')*EF.s1_diesel/1000,
+    s1_petrol:gv('s1_petrol')*EF.s1_petrol/1000,s1_lpg:gv('s1_lpg')*EF.s1_lpg/1000,
+    s1_refrig:gv('s1_refrig')*EF.s1_refrig/1000,s2_elec:gv('s2_elec')*EF.s2_elec/1000,
+    s2_renew:gv('s2_renew')*EF.s2_renew/1000,s2_heat:gv('s2_heat')*EF.s2_heat/1000,
+    s3_flight_s:gv('s3_flight_s')*EF.s3_flight_s/1000,s3_flight_l:gv('s3_flight_l')*EF.s3_flight_l/1000,
+    s3_commute:gv('s3_commute')*EF.s3_commute/1000,s3_freight:gv('s3_freight')*EF.s3_freight/1000,
+    s3_waste:gv('s3_waste')*EF.s3_waste/1000,s3_hotel:gv('s3_hotel')*EF.s3_hotel/1000,
+    s3_goods:gv('s3_goods')*EF.s3_goods/1000,s3_water:gv('s3_water')*EF.s3_water/1000
+  };
+  Object.keys(V).forEach(k=>{
+    const el=document.getElementById('r_'+k);if(!el)return;
+    const v2=k==='s2_renew'?-V[k]:V[k];
+    if(Math.abs(v2)>.0001){el.textContent=(v2<0?'−':'')+fmt(Math.abs(v2))+' tCO₂e';el.classList.add('on');}
+    else{el.textContent='—';el.classList.remove('on');}
+  });
+  const S1=V.s1_gas+V.s1_diesel+V.s1_petrol+V.s1_lpg+V.s1_refrig;
+  const S2=Math.max(0,V.s2_elec-V.s2_renew+V.s2_heat);
+  const S3=V.s3_flight_s+V.s3_flight_l+V.s3_commute+V.s3_freight+V.s3_waste+V.s3_hotel+V.s3_goods+V.s3_water;
+  const TOTAL=S1+S2+S3;T={S1,S2,S3,TOTAL};
+  ['s1','s2','s3'].forEach((s,i)=>{
+    const val=[S1,S2,S3][i];
+    document.getElementById('fig-'+s).textContent=fmt(val);
+    document.getElementById('pill-'+s).innerHTML=fmtB(val)+' <span class="punit">tCO₂e</span>';
+  });
+  document.getElementById('total-big').textContent=fmtB(TOTAL);
+  const b=document.getElementById('rating-badge');
+  if(TOTAL===0){b.style.background='var(--faint)';b.style.color='var(--muted)';b.textContent='No data entered';}
+  else if(TOTAL<10){b.style.background='rgba(62,207,142,.15)';b.style.color='var(--s1)';b.textContent='✦ Excellent';}
+  else if(TOTAL<50){b.style.background='rgba(62,207,142,.1)';b.style.color='var(--s1)';b.textContent='↑ Good';}
+  else if(TOTAL<150){b.style.background='rgba(201,168,76,.15)';b.style.color='var(--gold)';b.textContent='→ Moderate';}
+  else if(TOTAL<500){b.style.background='rgba(222,120,74,.15)';b.style.color='#DE784A';b.textContent='↓ High';}
+  else{b.style.background='rgba(220,60,60,.15)';b.style.color='#DC3C3C';b.textContent='⚠ Critical';}
+  if(TOTAL>0){
+    ['s1','s2','s3'].forEach((s,i)=>{
+      const pct=[S1,S2,S3][i]/TOTAL*100;
+      document.getElementById('bar-'+s).style.width=pct+'%';
+      document.getElementById('pct-'+s).textContent=Math.round(pct)+'%';
+    });
+  }else{
+    ['s1','s2','s3'].forEach(s=>{document.getElementById('bar-'+s).style.width='0%';document.getElementById('pct-'+s).textContent='0%';});
+  }
+}
+
+function tog(id){document.getElementById(id).classList.toggle('open');}
+function resetAll(){document.querySelectorAll('input[type="number"]').forEach(i=>i.value='');calc();}
+
+// ── PRINT / PDF ──────────────────────────────────────────
+const UNITS={
+  s1_gas:'m³/yr',s1_diesel:'L/yr',s1_petrol:'L/yr',s1_lpg:'L/yr',s1_refrig:'kg/yr',
+  s2_elec:'kWh/yr',s2_renew:'kWh/yr',s2_heat:'kWh/yr',
+  s3_flight_s:'pkm/yr',s3_flight_l:'pkm/yr',s3_commute:'km/yr',s3_freight:'tkm/yr',
+  s3_waste:'t/yr',s3_hotel:'nights/yr',s3_goods:'£k/yr',s3_water:'m³/yr'
+};
+const SCOPE_CLASS={s1_gas:'s1c',s1_diesel:'s1c',s1_petrol:'s1c',s1_lpg:'s1c',s1_refrig:'s1c',
+  s2_elec:'s2c',s2_renew:'s2c',s2_heat:'s2c',
+  s3_flight_s:'s3c',s3_flight_l:'s3c',s3_commute:'s3c',s3_freight:'s3c',
+  s3_waste:'s3c',s3_hotel:'s3c',s3_goods:'s3c',s3_water:'s3c'};
+
+function injectPrintValues(){
+  // Remove any existing print cells
+  document.querySelectorAll('.pv-input,.pv-result').forEach(e=>e.remove());
+  // For each input row, inject print-only value spans
+  document.querySelectorAll('.irow').forEach(row=>{
+    const inp=row.querySelector('input');
+    const resEl=row.querySelector('.rres');
+    if(!inp||!resEl)return;
+    const id=inp.id;
+    const rawVal=gv(id);
+    const unit=UNITS[id]||'';
+    const resText=resEl.textContent;
+    const sc=SCOPE_CLASS[id]||'';
+
+    const pvIn=document.createElement('span');
+    pvIn.className='pv-input no-screen';
+    pvIn.textContent=rawVal>0?(rawVal.toLocaleString()+' '+unit):'—';
+
+    const pvRes=document.createElement('span');
+    pvRes.className='pv-result '+sc+' no-screen';
+    pvRes.textContent=resText==='—'?'—':resText;
+
+    row.appendChild(pvIn);
+    row.appendChild(pvRes);
+  });
+  // Set print date
+  const pd=document.getElementById('print-date');
+  if(pd)pd.textContent='Printed '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+}
+
+function printPDF(){
+  injectPrintValues();
+  // Ensure all sections are open for print
+  ['sec1','sec2','sec3'].forEach(id=>document.getElementById(id).classList.add('open'));
+  setTimeout(()=>window.print(),120);
+}
+// ─────────────────────────────────────────────────────────
+
+function showReport(){
+  const{S1,S2,S3,TOTAL}=T;
+  const date=new Date().toLocaleDateString('en-GB',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('report-meta').textContent=`Prepared ${date}`;
+  const recs=[];
+  if(V.s1_gas>1)recs.push({s:'Scope 1 — Energy',t:'Switch on-site heating to heat pumps or biomass boilers to eliminate natural gas combustion.'});
+  if(V.s1_diesel+V.s1_petrol>1)recs.push({s:'Scope 1 — Fleet',t:'Transition company vehicles to EVs or hybrids to eliminate direct tailpipe emissions.'});
+  if(V.s1_refrig>.5)recs.push({s:'Scope 1 — Refrigerants',t:'Service AC and refrigeration units regularly to minimise refrigerant leaks; consider low-GWP alternatives.'});
+  if(V.s2_elec>2)recs.push({s:'Scope 2 — Electricity',t:'Switch to a 100% renewable electricity tariff or install on-site solar panels with battery storage.'});
+  if(V.s3_flight_s+V.s3_flight_l>1)recs.push({s:'Scope 3 — Travel',t:'Implement a travel policy favouring video conferencing; offset unavoidable flights through verified schemes (Gold Standard / VCS).'});
+  if(V.s3_commute>2)recs.push({s:'Scope 3 — Commuting',t:'Offer hybrid working, subsidised public transport, or a cycle-to-work scheme to reduce staff commuting emissions.'});
+  if(V.s3_waste>.5)recs.push({s:'Scope 3 — Waste',t:'Introduce a recycling programme to divert waste from landfill; explore zero-waste suppliers and composting.'});
+  if(V.s3_goods>2)recs.push({s:'Scope 3 — Supply Chain',t:'Engage key suppliers on decarbonisation targets; request carbon data and prefer lower-carbon alternatives.'});
+  if(recs.length===0)recs.push({s:'General',t:"Your footprint is minimal or incomplete. Continue to track annually and engage your supply chain to capture full Scope 3 data."});
+  const rows=keys=>keys.filter(k=>V[k]>.0001).map(k=>`<div class="rline"><span class="rln">${LBL[k]}</span><span class="rlv">${fmt(V[k])} tCO₂e</span></div>`).join('')||`<div class="rline"><span class="rln" style="font-style:italic">No data entered</span><span class="rlv">—</span></div>`;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="rblock">
+      <div class="rbtitle">Emissions Overview</div>
+      <div class="sgrid">
+        <div class="scard tot"><div class="sc-label">Total Footprint</div><div class="sc-val">${fmt(TOTAL)}</div><div class="sc-unit">tCO₂e / year</div></div>
+        <div class="scard s1"><div class="sc-label">Scope 1 — Direct</div><div class="sc-val">${fmt(S1)}</div><div class="sc-unit">${TOTAL>0?Math.round(S1/TOTAL*100):0}% of total</div></div>
+        <div class="scard s2"><div class="sc-label">Scope 2 — Energy</div><div class="sc-val">${fmt(S2)}</div><div class="sc-unit">${TOTAL>0?Math.round(S2/TOTAL*100):0}% of total</div></div>
+        <div class="scard s3"><div class="sc-label">Scope 3 — Value Chain</div><div class="sc-val">${fmt(S3)}</div><div class="sc-unit">${TOTAL>0?Math.round(S3/TOTAL*100):0}% of total</div></div>
+      </div>
+    </div>
+    <div class="rblock"><div class="rbtitle">Scope 1 Breakdown</div>${rows(['s1_gas','s1_diesel','s1_petrol','s1_lpg','s1_refrig'])}</div>
+    <div class="rblock"><div class="rbtitle">Scope 2 Breakdown</div>${rows(['s2_elec','s2_renew','s2_heat'])}</div>
+    <div class="rblock"><div class="rbtitle">Scope 3 Breakdown</div>${rows(['s3_flight_s','s3_flight_l','s3_commute','s3_freight','s3_waste','s3_hotel','s3_goods','s3_water'])}</div>
+    <div class="rblock"><div class="rbtitle">Recommended Actions</div>${recs.map(r=>`<div class="rec"><div class="rec-s">${r.s}</div><div class="rec-t">${r.t}</div></div>`).join('')}</div>
+    <div class="rblock"><div class="rbtitle">Methodology</div><div class="mnote">Emission factors from the <strong>UK Government GHG Conversion Factor repository (2023)</strong> and <strong>IPCC AR6 GWP values</strong>. UK grid: 0.233 kgCO₂e/kWh. R-410A GWP: 2,088. Scope 3 spend-based estimates use EXIOBASE averages. For formal ESG disclosure, CDP or CSRD compliance, third-party verification and sector-specific factors are recommended.</div></div>`;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+calc();
+</script>
+</body>
+</html>
