@@ -3,296 +3,557 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carbon Intelligence — ESG Emissions Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Figtree:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<title>ESG Carbon Calculator | Evronai</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Source+Sans+3:wght@300;400;500;600;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ── RESET ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── TOKENS ── */
 :root {
-  --bg: #0C0F0E;
-  --surf: #111615;
-  --surf2: #161C1A;
-  --bdr: rgba(255,255,255,0.07);
-  --bdr2: rgba(255,255,255,0.12);
-  --txt: #E8EAE9;
-  --mut: #6B7875;
-  --fnt: #1E2826;
-  --s1: #3ECF8E;  --s1d: rgba(62,207,142,0.12);  --s1g: rgba(62,207,142,0.25);
-  --s2: #4AADDE;  --s2d: rgba(74,173,222,0.12);   --s2g: rgba(74,173,222,0.25);
-  --s3: #C084FC;  --s3d: rgba(192,132,252,0.12);  --s3g: rgba(192,132,252,0.25);
-  --gold: #C9A84C; --goldd: rgba(201,168,76,0.15);
-  --ff: 'Cormorant Garamond', Georgia, serif;
-  --fb: 'Figtree', sans-serif;
-  --fm: 'JetBrains Mono', monospace;
-  --r: 6px; --rl: 12px;
+  /* Evronai brand colours */
+  --ev-green:  #2DBE6C;
+  --ev-teal:     #0F7B5E;
+  --ev-lime:  #8DC63F;
+  --ev-dark:   #0D1F1A;
+  --ev-grey1:   #F2F2F2;
+  --ev-grey2:   #E0E0E0;
+  --ev-grey3:   #9E9E9E;
+  --ev-grey4:   #616161;
+  --ev-white:   #FFFFFF;
+
+  /* Scope accent colours — warm, professional */
+  --s1:   #0F7B5E;
+  --s1l:  rgba(15,123,94,0.09);
+  --s2:   #2DBE6C;
+  --s2l:  rgba(45,190,108,0.09);
+  --s3:   #8DC63F;
+  --s3l:  rgba(141,198,63,0.10);
+
+  --ff: 'Source Serif 4', Georgia, serif;
+  --fb: 'Source Sans 3', Helvetica, sans-serif;
+  --fm: 'Source Code Pro', monospace;
+  --r: 2px;
+  --rl: 4px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.12), 0 12px 48px rgba(0,0,0,0.08);
 }
 
-/* ── BASE ── */
 html { scroll-behavior: smooth; }
-body { font-family: var(--fb); background: var(--bg); color: var(--txt); min-height: 100vh; line-height: 1.6; font-size: 14px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--fb);
+  background: var(--ev-grey1);
+  color: var(--ev-dark);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
 
-/* grain */
-body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: .5; }
+/* ── TOP NAV ── */
+.nav {
+  background: var(--ev-dark);
+  padding: 0 2.5rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.ev-mark {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.ev-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.ev-dot:nth-child(1) { background: #0F7B5E; }
+.ev-dot:nth-child(2) { background: #2DBE6C; }
+.ev-dot:nth-child(3) { background: #8DC63F; }
+.nav-brand {
+  font-family: var(--fb);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: white;
+  letter-spacing: -0.01em;
+}
+.nav-divider {
+  width: 1px; height: 20px;
+  background: rgba(255,255,255,0.2);
+  margin: 0 1rem;
+}
+.nav-title {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.55);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.nav-right {
+  font-family: var(--fm);
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
 
-/* ambient */
-.amb { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: .055; }
-.o1 { width: 600px; height: 600px; background: var(--s1); top: -200px; left: -100px; }
-.o2 { width: 500px; height: 500px; background: var(--s2); bottom: -200px; right: -100px; }
-.o3 { width: 400px; height: 400px; background: var(--s3); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+/* ── HERO BANNER ── */
+.hero {
+  background: var(--ev-dark);
+  padding: 3rem 2.5rem 3.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #0F7B5E 0%, #2DBE6C 50%, #8DC63F 100%);
+}
+.hero-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 3rem;
+}
+.hero-eyebrow {
+  font-family: var(--fb);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ev-green);
+  margin-bottom: 1rem;
+}
+.hero h1 {
+  font-family: var(--ff);
+  font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+  font-weight: 300;
+  color: white;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.hero h1 strong {
+  font-weight: 600;
+  color: var(--ev-green);
+}
+.hero-sub {
+  margin-top: 0.9rem;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.55);
+  max-width: 480px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+.hero-total {
+  text-align: right;
+  flex-shrink: 0;
+}
+.ht-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 0.4rem;
+}
+.ht-number {
+  font-family: var(--ff);
+  font-size: clamp(3rem, 5vw, 4.5rem);
+  font-weight: 300;
+  line-height: 1;
+  color: var(--ev-green);
+  transition: color 0.3s;
+}
+.ht-unit {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  font-family: var(--fm);
+  margin-top: 0.3rem;
+}
+.ht-badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.04em;
+  transition: all 0.3s;
+}
 
-.shell { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 2rem 6rem; }
+/* ── MAIN CONTENT ── */
+.content {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 2.5rem 2.5rem 5rem;
+}
 
-/* ── HEADER ── */
-.hdr { padding: 3.5rem 0 3rem; border-bottom: 1px solid var(--bdr); margin-bottom: 3rem; display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; animation: fu .7s ease both; }
-.wm { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.5rem; }
-.wm-icon { width: 32px; height: 32px; border: 1px solid var(--s1); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-.wm-txt { font-family: var(--fm); font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--mut); }
-.hdr h1 { font-family: var(--ff); font-size: clamp(2.4rem,5vw,3.6rem); font-weight: 300; line-height: 1.05; letter-spacing: -.02em; }
-.hdr h1 em { font-style: italic; color: var(--s1); }
-.hdr-sub { margin-top: .75rem; color: var(--mut); font-size: .875rem; font-weight: 300; max-width: 420px; line-height: 1.7; }
-.tc-lbl { font-family: var(--fm); font-size: .62rem; letter-spacing: .15em; text-transform: uppercase; color: var(--mut); margin-bottom: .4rem; text-align: right; }
-.tc-num { font-family: var(--ff); font-size: clamp(2.5rem,4vw,4rem); font-weight: 300; line-height: 1; color: var(--gold); transition: color .4s; text-align: right; }
-.tc-unit { font-size: .75rem; color: var(--mut); margin-top: .3rem; font-family: var(--fm); text-align: right; }
-.tc-rate { display: inline-flex; align-items: center; gap: .4rem; margin-top: .6rem; padding: .3rem .8rem; border-radius: 20px; font-size: .72rem; font-weight: 500; letter-spacing: .04em; transition: background .4s, color .4s; background: var(--fnt); color: var(--mut); float: right; clear: both; }
-
-/* ── SCOPE PILLS ── */
-.pills { display: flex; gap: 1rem; margin-bottom: 2.5rem; animation: fu .7s .1s ease both; }
-.pill { flex: 1; padding: 1.2rem 1.5rem; border-radius: var(--r); border: 1px solid var(--bdr); background: var(--surf); position: relative; overflow: hidden; transition: border-color .2s, transform .2s; cursor: default; }
-.pill:hover { transform: translateY(-2px); }
-.pill::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
-.pill.s1::before { background: var(--s1); } .pill.s2::before { background: var(--s2); } .pill.s3::before { background: var(--s3); }
-.pill.s1 { border-color: rgba(62,207,142,.2); } .pill.s2 { border-color: rgba(74,173,222,.2); } .pill.s3 { border-color: rgba(192,132,252,.2); }
-.ptag { font-family: var(--fm); font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .5rem; }
-.s1 .ptag { color: var(--s1); } .s2 .ptag { color: var(--s2); } .s3 .ptag { color: var(--s3); }
-.pname { font-size: .9rem; font-weight: 500; margin-bottom: .2rem; }
-.pdesc { font-size: .75rem; color: var(--mut); line-height: 1.5; }
-.ptot { font-family: var(--ff); font-size: 1.6rem; font-weight: 300; margin-top: .8rem; line-height: 1; }
-.s1 .ptot { color: var(--s1); } .s2 .ptot { color: var(--s2); } .s3 .ptot { color: var(--s3); }
-.punit { font-family: var(--fm); font-size: .62rem; color: var(--mut); margin-left: .3rem; }
+/* ── SCOPE CARDS ── */
+.scope-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--ev-grey2);
+  border: 1px solid var(--ev-grey2);
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+}
+.scope-card {
+  background: white;
+  padding: 1.5rem 1.75rem;
+  position: relative;
+  overflow: hidden;
+}
+.scope-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.scope-card.s1::before { background: var(--s1); }
+.scope-card.s2::before { background: var(--s2); }
+.scope-card.s3::before { background: var(--s3); }
+.sc-eyebrow {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.s1 .sc-eyebrow { color: var(--s1); }
+.s2 .sc-eyebrow { color: var(--s2); }
+.s3 .sc-eyebrow { color: var(--s3); }
+.sc-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem; }
+.sc-desc { font-size: 0.78rem; color: var(--ev-grey4); line-height: 1.5; }
+.sc-total {
+  font-family: var(--ff);
+  font-size: 1.9rem;
+  font-weight: 300;
+  line-height: 1;
+  margin-top: 1rem;
+}
+.s1 .sc-total { color: var(--s1); }
+.s2 .sc-total { color: var(--s2); }
+.s3 .sc-total { color: var(--s3); }
+.sc-total-unit { font-family: var(--fm); font-size: 0.6rem; color: var(--ev-grey3); margin-left: 0.25rem; }
 
 /* ── ACCORDION SECTIONS ── */
-.sec { background: var(--surf); border: 1px solid var(--bdr); border-radius: var(--rl); margin-bottom: 1.5rem; overflow: hidden; animation: fu .6s ease both; transition: border-color .2s; }
-.sec.s1:hover { border-color: rgba(62,207,142,.25); } .sec.s2:hover { border-color: rgba(74,173,222,.25); } .sec.s3:hover { border-color: rgba(192,132,252,.25); }
-.sec-hd { display: flex; align-items: center; gap: 1.25rem; padding: 1.4rem 2rem; cursor: pointer; user-select: none; border-bottom: 1px solid transparent; transition: background .15s, border-color .2s; }
-.sec-hd:hover { background: rgba(255,255,255,.02); }
-.sec.open .sec-hd { border-bottom-color: var(--bdr); }
-.sico { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--fm); font-weight: 500; font-size: .7rem; letter-spacing: .05em; flex-shrink: 0; }
-.s1 .sico { background: var(--s1d); color: var(--s1); border: 1px solid rgba(62,207,142,.2); }
-.s2 .sico { background: var(--s2d); color: var(--s2); border: 1px solid rgba(74,173,222,.2); }
-.s3 .sico { background: var(--s3d); color: var(--s3); border: 1px solid rgba(192,132,252,.2); }
-.smet { flex: 1; }
-.smet h2 { font-size: .95rem; font-weight: 600; letter-spacing: .01em; }
-.smet p { font-size: .78rem; color: var(--mut); margin-top: .1rem; }
-.sfig { font-family: var(--ff); font-size: 1.6rem; font-weight: 300; line-height: 1; }
-.s1 .sfig { color: var(--s1); } .s2 .sfig { color: var(--s2); } .s3 .sfig { color: var(--s3); }
-.sfig-u { font-family: var(--fm); font-size: .62rem; color: var(--mut); margin-left: .25rem; }
-.chev { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--bdr); display: flex; align-items: center; justify-content: center; color: var(--mut); font-size: .7rem; transition: transform .3s, background .2s; flex-shrink: 0; }
-.sec.open .chev { transform: rotate(180deg); background: var(--fnt); }
-.sec-bd { display: none; }
-.sec.open .sec-bd { display: block; }
+.acc {
+  background: white;
+  border: 1px solid var(--ev-grey2);
+  margin-bottom: 1px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.acc:first-of-type { border-radius: var(--rl) var(--rl) 0 0; }
+.acc:last-of-type  { border-radius: 0 0 var(--rl) var(--rl); margin-bottom: 2rem; }
+.acc-hd {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.75rem;
+  cursor: pointer;
+  user-select: none;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, border-color 0.2s;
+}
+.acc-hd:hover { background: var(--ev-grey1); }
+.acc.s1 .acc-hd { border-left-color: var(--s1); }
+.acc.s2 .acc-hd { border-left-color: var(--s2); }
+.acc.s3 .acc-hd { border-left-color: var(--s3); }
+.acc-badge {
+  width: 32px; height: 32px;
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--fm); font-size: 0.65rem; font-weight: 500;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+}
+.s1 .acc-badge { background: var(--s1l); color: var(--s1); }
+.s2 .acc-badge { background: var(--s2l); color: var(--s2); }
+.s3 .acc-badge { background: var(--s3l); color: var(--s3); }
+.acc-meta { flex: 1; }
+.acc-meta h2 { font-size: 0.92rem; font-weight: 600; }
+.acc-meta p  { font-size: 0.75rem; color: var(--ev-grey3); margin-top: 0.1rem; }
+.acc-fig { font-family: var(--ff); font-size: 1.5rem; font-weight: 300; line-height: 1; }
+.s1 .acc-fig { color: var(--s1); }
+.s2 .acc-fig { color: var(--s2); }
+.s3 .acc-fig { color: var(--s3); }
+.acc-fig-u { font-family: var(--fm); font-size: 0.58rem; color: var(--ev-grey3); margin-left: 0.2rem; }
+.acc-chev {
+  width: 24px; height: 24px;
+  border: 1px solid var(--ev-grey2);
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ev-grey3); font-size: 0.6rem;
+  transition: transform 0.25s, background 0.15s;
+  flex-shrink: 0;
+}
+.acc.open .acc-chev { transform: rotate(180deg); background: var(--ev-grey1); }
+.acc-bd { display: none; border-top: 1px solid var(--ev-grey2); }
+.acc.open .acc-bd { display: block; }
 
 /* ── INPUT ROWS ── */
-.irow { display: grid; grid-template-columns: 1fr 220px 110px; align-items: center; gap: 1.5rem; padding: 1.1rem 2rem; border-bottom: 1px solid var(--bdr); transition: background .12s; }
+.irow {
+  display: grid;
+  grid-template-columns: 1fr 210px 110px;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 1.75rem;
+  border-bottom: 1px solid var(--ev-grey1);
+  transition: background 0.1s;
+}
 .irow:last-child { border-bottom: none; }
-.irow:hover { background: rgba(255,255,255,.015); }
-.rl-name { font-size: .875rem; font-weight: 500; }
-.rl-hint { font-size: .73rem; color: var(--mut); margin-top: .15rem; line-height: 1.4; }
-.ri { display: flex; align-items: center; background: var(--surf2); border: 1px solid var(--bdr2); border-radius: var(--r); overflow: hidden; transition: border-color .2s, box-shadow .2s; }
-.ri:focus-within { border-color: var(--gold); box-shadow: 0 0 0 3px var(--goldd); }
-.ri input { flex: 1; background: none; border: none; outline: none; padding: .6rem .9rem; font-family: var(--fm); font-size: .88rem; color: var(--txt); text-align: right; width: 100%; min-width: 0; }
-.ri input::placeholder { color: var(--mut); opacity: .5; }
-.ru { padding: .6rem .75rem; font-family: var(--fm); font-size: .65rem; color: var(--mut); background: var(--fnt); border-left: 1px solid var(--bdr); white-space: nowrap; line-height: 1; }
-.rr { text-align: right; font-family: var(--fm); font-size: .8rem; color: var(--mut); transition: color .2s; }
-.rr.on { color: var(--txt); }
+.irow:hover { background: #FAFAFA; }
+.rl-name { font-size: 0.875rem; font-weight: 500; color: var(--ev-dark); }
+.rl-hint { font-size: 0.72rem; color: var(--ev-grey3); margin-top: 0.1rem; line-height: 1.4; }
+.ri {
+  display: flex; align-items: center;
+  border: 1px solid var(--ev-grey2);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: white;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.ri:focus-within {
+  border-color: var(--ev-green);
+  box-shadow: 0 0 0 3px rgba(232,119,34,0.12);
+}
+.ri input {
+  flex: 1; background: none; border: none; outline: none;
+  padding: 0.55rem 0.8rem;
+  font-family: var(--fm); font-size: 0.85rem;
+  color: var(--ev-dark); text-align: right;
+  width: 100%; min-width: 0;
+}
+.ri input::placeholder { color: var(--ev-grey3); opacity: 0.6; }
+.ru {
+  padding: 0.55rem 0.65rem;
+  font-family: var(--fm); font-size: 0.62rem;
+  color: var(--ev-grey3);
+  background: var(--ev-grey1);
+  border-left: 1px solid var(--ev-grey2);
+  white-space: nowrap;
+  line-height: 1;
+}
+.rr { text-align: right; font-family: var(--fm); font-size: 0.78rem; color: var(--ev-grey3); transition: color 0.2s; }
+.rr.on { color: var(--ev-dark); font-weight: 500; }
 
-/* ── DISTRIBUTION BAR ── */
-.dist { margin: 2.5rem 0; }
-.dl { font-family: var(--fm); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); margin-bottom: .9rem; }
-.dtrack { height: 6px; background: var(--fnt); border-radius: 10px; overflow: hidden; display: flex; }
-.dseg { height: 100%; transition: width .6s cubic-bezier(.4,0,.2,1); min-width: 0; }
-.dseg.s1 { background: var(--s1); } .dseg.s2 { background: var(--s2); } .dseg.s3 { background: var(--s3); }
-.dleg { display: flex; gap: 2rem; margin-top: .9rem; }
-.di { display: flex; align-items: center; gap: .5rem; font-size: .75rem; color: var(--mut); }
-.ddot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+/* print-only cells */
+.p-only { display: none; }
+
+/* ── DISTRIBUTION ── */
+.dist {
+  background: white;
+  border: 1px solid var(--ev-grey2);
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+}
+.dist-lbl {
+  font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ev-grey3); margin-bottom: 0.9rem;
+}
+.dtrack { height: 6px; background: var(--ev-grey2); border-radius: 1px; display: flex; overflow: hidden; }
+.dseg { height: 100%; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); min-width: 0; }
+.dseg.s1 { background: var(--s1); }
+.dseg.s2 { background: var(--s2); }
+.dseg.s3 { background: var(--s3); }
+.dleg { display: flex; gap: 2rem; margin-top: 0.9rem; }
+.di { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--ev-grey4); }
+.ddot { width: 8px; height: 8px; border-radius: 1px; flex-shrink: 0; }
 .ddot.s1 { background: var(--s1); } .ddot.s2 { background: var(--s2); } .ddot.s3 { background: var(--s3); }
-.dpct { font-family: var(--fm); font-weight: 500; }
+.dpct { font-family: var(--fm); font-weight: 600; font-size: 0.72rem; }
+#pct-s1 { color: var(--s1); } #pct-s2 { color: var(--s2); } #pct-s3 { color: var(--s3); }
 
-/* ── ACTION BUTTONS ── */
-.acts { display: flex; gap: 1rem; margin-top: 1.5rem; }
-.btn { display: inline-flex; align-items: center; gap: .6rem; padding: .8rem 1.8rem; border-radius: var(--r); font-family: var(--fb); font-size: .85rem; font-weight: 500; cursor: pointer; transition: all .2s; letter-spacing: .01em; border: none; }
-.btn-p { background: var(--s1); color: #0C0F0E; }
-.btn-p:hover { background: #5DF0A8; transform: translateY(-1px); box-shadow: 0 8px 24px var(--s1g); }
-.btn-s { background: var(--surf2); color: var(--txt); border: 1px solid var(--bdr2); }
-.btn-s:hover { background: var(--fnt); transform: translateY(-1px); }
+/* ── ACTIONS ── */
+.acts { display: flex; gap: 0.75rem; margin-bottom: 2.5rem; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--fb); font-size: 0.84rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; letter-spacing: 0.01em;
+  border: none; border-radius: var(--r);
+}
+.btn-primary { background: var(--ev-teal); color: white; }
+.btn-primary:hover { background: #B83D00; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(208,74,2,0.3); }
+.btn-secondary { background: white; color: var(--ev-dark); border: 1px solid var(--ev-grey2); }
+.btn-secondary:hover { background: var(--ev-grey1); border-color: var(--ev-grey3); }
+.btn-ghost { background: transparent; color: var(--ev-grey4); border: 1px solid var(--ev-grey2); }
+.btn-ghost:hover { background: var(--ev-grey1); }
 .btn:active { transform: translateY(0) !important; }
 
 /* ── DISCLAIMER ── */
-.disc { margin-top: 2.5rem; padding: 1.2rem 1.5rem; background: var(--surf); border: 1px solid var(--bdr); border-radius: var(--r); display: flex; gap: 1rem; align-items: flex-start; }
-.disc-ico { width: 28px; height: 28px; border-radius: 50%; background: var(--fnt); display: flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; margin-top: .1rem; }
-.disc p { font-size: .78rem; color: var(--mut); line-height: 1.6; }
-.disc strong { color: var(--txt); }
+.disc {
+  background: white; border: 1px solid var(--ev-grey2);
+  border-left: 3px solid var(--ev-green);
+  padding: 1.1rem 1.5rem;
+  display: flex; gap: 0.9rem; align-items: flex-start;
+  font-size: 0.78rem; color: var(--ev-grey4); line-height: 1.6;
+}
+.disc strong { color: var(--ev-dark); }
 
 /* ── MODAL ── */
-.ovl { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; padding: 1.5rem; }
-.ovl.open { display: flex; animation: fi .2s ease; }
+.ovl { display: none; position: fixed; inset: 0; background: rgba(29,29,27,0.6); backdrop-filter: blur(4px); z-index: 300; align-items: center; justify-content: center; padding: 1.5rem; }
+.ovl.open { display: flex; animation: fi 0.2s ease; }
 @keyframes fi { from { opacity: 0; } to { opacity: 1; } }
-@keyframes su { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-.modal { background: var(--surf); border: 1px solid var(--bdr2); border-radius: var(--rl); max-width: 680px; width: 100%; max-height: 88vh; overflow-y: auto; box-shadow: 0 40px 80px rgba(0,0,0,.6); animation: su .3s ease; }
-.mhd { padding: 2rem 2.5rem 1.5rem; border-bottom: 1px solid var(--bdr); display: flex; justify-content: space-between; align-items: flex-start; position: sticky; top: 0; background: var(--surf); z-index: 1; }
-.mhd h2 { font-family: var(--ff); font-size: 1.8rem; font-weight: 300; line-height: 1.1; }
-.mhd h2 em { font-style: italic; color: var(--gold); }
-.mhd p { font-size: .78rem; color: var(--mut); margin-top: .3rem; }
-.mclose { background: var(--fnt); border: 1px solid var(--bdr); color: var(--mut); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; transition: background .2s, color .2s; }
-.mclose:hover { background: var(--s1d); color: var(--s1); }
-.mbody { padding: 2rem 2.5rem; }
-.rblk { margin-bottom: 2.5rem; }
+@keyframes su { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.modal { background: white; border-radius: var(--rl); max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: su 0.25s ease; }
+.mhd {
+  padding: 1.75rem 2rem 1.5rem;
+  border-bottom: 1px solid var(--ev-grey2);
+  display: flex; justify-content: space-between; align-items: flex-start;
+  position: sticky; top: 0; background: white; z-index: 1;
+  border-top: 4px solid var(--ev-green);
+}
+.mhd h2 { font-family: var(--ff); font-size: 1.6rem; font-weight: 400; line-height: 1.1; color: var(--ev-dark); }
+.mhd h2 span { color: var(--ev-teal); font-weight: 600; }
+.mhd p { font-size: 0.75rem; color: var(--ev-grey3); margin-top: 0.3rem; }
+.mclose { background: var(--ev-grey1); border: 1px solid var(--ev-grey2); color: var(--ev-grey4); width: 30px; height: 30px; border-radius: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: background 0.15s; flex-shrink: 0; }
+.mclose:hover { background: var(--ev-grey2); }
+.mbody { padding: 2rem; }
+.rblk { margin-bottom: 2rem; }
 .rblk:last-child { margin-bottom: 0; }
-.rbtl { font-family: var(--fm); font-size: .62rem; letter-spacing: .15em; text-transform: uppercase; color: var(--mut); padding-bottom: .75rem; border-bottom: 1px solid var(--bdr); margin-bottom: 1rem; }
-.sgrid { display: grid; grid-template-columns: repeat(2,1fr); gap: .75rem; margin-bottom: 1.5rem; }
-.scard { background: var(--surf2); border: 1px solid var(--bdr); border-radius: var(--r); padding: 1.2rem; }
-.sc-lbl { font-family: var(--fm); font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; color: var(--mut); margin-bottom: .4rem; }
+.rbtl { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ev-grey3); padding-bottom: 0.65rem; border-bottom: 2px solid var(--ev-grey2); margin-bottom: 1rem; }
+.sgrid { display: grid; grid-template-columns: repeat(2,1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
+.scard { border: 1px solid var(--ev-grey2); padding: 1.1rem 1.25rem; border-radius: var(--r); }
+.scard.tot { border-top: 3px solid var(--ev-green); }
+.scard.c1  { border-top: 3px solid var(--s1); }
+.scard.c2  { border-top: 3px solid var(--s2); }
+.scard.c3  { border-top: 3px solid var(--s3); }
+.sc-lbl { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ev-grey3); margin-bottom: 0.4rem; }
 .sc-val { font-family: var(--ff); font-size: 2rem; font-weight: 300; line-height: 1; }
-.scard.tot .sc-val { color: var(--gold); } .scard.c1 .sc-val { color: var(--s1); } .scard.c2 .sc-val { color: var(--s2); } .scard.c3 .sc-val { color: var(--s3); }
-.sc-unit { font-family: var(--fm); font-size: .65rem; color: var(--mut); margin-top: .3rem; }
-.rline { display: flex; justify-content: space-between; align-items: baseline; padding: .55rem 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: .84rem; }
+.scard.tot .sc-val { color: var(--ev-green); }
+.scard.c1 .sc-val { color: var(--s1); }
+.scard.c2 .sc-val { color: var(--s2); }
+.scard.c3 .sc-val { color: var(--s3); }
+.sc-unit { font-family: var(--fm); font-size: 0.62rem; color: var(--ev-grey3); margin-top: 0.3rem; }
+.rline { display: flex; justify-content: space-between; align-items: baseline; padding: 0.5rem 0; border-bottom: 1px solid var(--ev-grey1); font-size: 0.84rem; }
 .rline:last-child { border-bottom: none; }
-.rline .rln { color: var(--mut); } .rline .rlv { font-family: var(--fm); font-size: .78rem; color: var(--txt); }
-.rec { background: var(--surf2); border: 1px solid var(--bdr); border-left: 2px solid var(--gold); border-radius: var(--r); padding: 1rem 1.25rem; margin-bottom: .75rem; }
+.rline .rln { color: var(--ev-grey4); }
+.rline .rlv { font-family: var(--fm); font-size: 0.76rem; color: var(--ev-dark); font-weight: 500; }
+.rec { border-left: 3px solid var(--ev-green); padding: 0.85rem 1rem; margin-bottom: 0.6rem; background: #F2FBF6; border-radius: 0 var(--r) var(--r) 0; }
 .rec:last-child { margin-bottom: 0; }
-.rec-s { font-family: var(--fm); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin-bottom: .35rem; }
-.rec-t { font-size: .84rem; line-height: 1.6; }
-.mnote { background: var(--surf2); border: 1px solid var(--bdr); border-radius: var(--r); padding: 1rem 1.25rem; font-size: .78rem; color: var(--mut); line-height: 1.7; }
-.mnote strong { color: var(--txt); }
+.rec-s { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ev-green); margin-bottom: 0.3rem; }
+.rec-t { font-size: 0.84rem; line-height: 1.6; color: var(--ev-dark); }
+.mnote { background: var(--ev-grey1); padding: 1rem 1.1rem; font-size: 0.76rem; color: var(--ev-grey4); line-height: 1.7; border-radius: var(--r); }
+.mnote strong { color: var(--ev-dark); }
 
-/* ── PRINT-ONLY ELEMENTS (hidden on screen) ── */
-.p-only { display: none; }
+/* ── FOOTER ── */
+.footer {
+  background: var(--ev-dark);
+  padding: 1.5rem 2.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-left { display: flex; align-items: center; gap: 1rem; }
+.footer p { font-size: 0.72rem; color: rgba(255,255,255,0.35); }
+.footer strong { color: rgba(255,255,255,0.55); }
+
+/* ── PRINT FOOTER ── */
+.p-footer { display: none; }
 
 /* ── ANIMATIONS ── */
-@keyframes fu { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.content > * { animation: fu 0.5s ease both; }
+.content > *:nth-child(1) { animation-delay: 0.05s; }
+.content > *:nth-child(2) { animation-delay: 0.1s; }
+.content > *:nth-child(3) { animation-delay: 0.15s; }
+.content > *:nth-child(4) { animation-delay: 0.2s; }
+@keyframes fu { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--surf); }
-::-webkit-scrollbar-thumb { background: var(--fnt); border-radius: 10px; }
+::-webkit-scrollbar-track { background: var(--ev-grey1); }
+::-webkit-scrollbar-thumb { background: var(--ev-grey2); border-radius: 10px; }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 680px) {
-  .pills { flex-direction: column; }
-  .hdr { flex-direction: column; align-items: flex-start; }
-  .irow { grid-template-columns: 1fr 180px 100px; gap: .75rem; }
+@media (max-width: 720px) {
+  .scope-cards { grid-template-columns: 1fr; }
+  .hero-inner { flex-direction: column; align-items: flex-start; }
+  .hero-total { text-align: left; }
+  .ht-badge { float: none; }
+  .irow { grid-template-columns: 1fr 160px 95px; gap: 0.75rem; }
   .acts { flex-direction: column; }
-  .sgrid { grid-template-columns: 1fr 1fr; }
-  .tc-lbl, .tc-num, .tc-unit, .tc-rate { text-align: left; float: none; }
+  .content { padding: 1.5rem 1.25rem 4rem; }
 }
 
-/* ============================================================
-   PRINT / PDF STYLESHEET
-   ============================================================ */
+/* =====================================================
+   PRINT / PDF STYLES
+   ===================================================== */
 @media print {
-  /* Paper */
   @page { size: A4; margin: 14mm 16mm 18mm; }
 
   *, *::before, *::after { box-sizing: border-box; }
   html, body {
     background: #fff !important;
-    color: #111 !important;
-    font-size: 10.5pt;
+    color: #1D1D1B !important;
+    font-size: 10pt;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
-  /* Kill decorative elements */
-  body::before, .amb, .acts, .disc, .ovl, .chev { display: none !important; }
+  .nav, .acts, .disc, .ovl, .footer, .acc-chev { display: none !important; }
 
-  .shell { max-width: 100%; padding: 0; margin: 0; }
-
-  /* ── Print Header ── */
-  .hdr {
-    padding: 0 0 1.2rem;
-    margin-bottom: 1.4rem;
-    border-bottom: 2px solid #1a7a52 !important;
-    display: flex !important;
-    align-items: flex-start;
-    justify-content: space-between;
-    animation: none;
+  .hero {
+    background: #1D1D1B !important;
+    padding: 1.2rem 0 1.5rem;
+    margin-bottom: 1.2rem;
     page-break-after: avoid;
   }
-  .wm-icon { border-color: #1a7a52 !important; }
-  .wm-txt { color: #555 !important; }
-  .hdr h1 { font-size: 24pt; color: #111 !important; }
-  .hdr h1 em { color: #1a7a52 !important; }
-  .hdr-sub { color: #555 !important; font-size: 8.5pt; max-width: 360px; }
-  .tc-lbl { color: #666 !important; text-align: right; }
-  .tc-num { font-size: 28pt !important; color: #8a6a1a !important; text-align: right; }
-  .tc-unit { color: #666 !important; text-align: right; }
-  .tc-rate {
-    float: right; clear: both; margin-top: .4rem;
-    padding: .2rem .6rem; border-radius: 20px;
-    font-size: 7.5pt; border: 1px solid currentColor;
-    background: #fff !important;
-  }
+  .hero::after { height: 3px; }
+  .hero-inner { gap: 1.5rem; }
+  .hero-eyebrow { font-size: 7pt; }
+  .hero h1 { font-size: 20pt; }
+  .hero h1 strong { color: #2DBE6C !important; }
+  .hero-sub { font-size: 8pt; color: rgba(255,255,255,0.55) !important; }
+  .ht-label { font-size: 6pt; }
+  .ht-number { font-size: 28pt !important; color: #2DBE6C !important; }
+  .ht-unit { font-size: 7pt; }
+  .ht-badge { border-color: rgba(255,255,255,0.2) !important; font-size: 7pt; }
 
-  /* ── Print Pills ── */
-  .pills {
-    display: flex !important;
-    gap: .6rem;
-    margin-bottom: 1.2rem;
-    page-break-inside: avoid;
-    animation: none;
-  }
-  .pill {
-    flex: 1; padding: .9rem 1rem;
-    border-radius: 4px;
-    background: #f8f8f6 !important;
-    border: 1px solid rgba(0,0,0,.1) !important;
-  }
-  .pill::before { height: 3px !important; }
-  .pill.s1::before { background: #1a7a52 !important; }
-  .pill.s2::before { background: #1565a0 !important; }
-  .pill.s3::before { background: #6b21a8 !important; }
-  .ptag { font-size: 6pt; }
-  .s1 .ptag { color: #1a7a52 !important; } .s2 .ptag { color: #1565a0 !important; } .s3 .ptag { color: #6b21a8 !important; }
-  .pname { font-size: 8.5pt; color: #111 !important; }
-  .pdesc { font-size: 7.5pt; color: #666 !important; }
-  .ptot { font-size: 15pt; margin-top: .4rem; }
-  .s1 .ptot { color: #1a7a52 !important; } .s2 .ptot { color: #1565a0 !important; } .s3 .ptot { color: #6b21a8 !important; }
-  .punit { color: #888 !important; }
+  .content { padding: 0; max-width: 100%; }
 
-  /* ── Print Sections ── */
-  .sec {
-    border: 1px solid rgba(0,0,0,.1) !important;
-    border-radius: 4px;
-    margin-bottom: .9rem;
-    page-break-inside: avoid;
-    background: #fff !important;
-    animation: none;
-    overflow: visible;
-  }
-  .sec.s1 { border-top: 2.5px solid #1a7a52 !important; }
-  .sec.s2 { border-top: 2.5px solid #1565a0 !important; }
-  .sec.s3 { border-top: 2.5px solid #6b21a8 !important; }
-  .sec-hd {
-    padding: .7rem 1rem;
-    border-bottom: 1px solid rgba(0,0,0,.08) !important;
-    display: flex; align-items: center; gap: .75rem;
-    cursor: default;
-    background: #fff !important;
-  }
-  .s1 .sico { background: rgba(26,122,82,.08) !important; color: #1a7a52 !important; border-color: rgba(26,122,82,.2) !important; }
-  .s2 .sico { background: rgba(21,101,160,.08) !important; color: #1565a0 !important; border-color: rgba(21,101,160,.2) !important; }
-  .s3 .sico { background: rgba(107,33,168,.08) !important; color: #6b21a8 !important; border-color: rgba(107,33,168,.2) !important; }
-  .smet h2 { font-size: 9.5pt; color: #111 !important; }
-  .smet p { font-size: 7.5pt; color: #666 !important; }
-  .sfig { font-size: 13pt; }
-  .s1 .sfig { color: #1a7a52 !important; } .s2 .sfig { color: #1565a0 !important; } .s3 .sfig { color: #6b21a8 !important; }
-  .sfig-u { color: #888 !important; }
+  .scope-cards { margin-bottom: 1rem; box-shadow: none; gap: 1px; background: #E0E0E0; border-color: #E0E0E0; }
+  .scope-card { padding: 0.9rem 1.1rem; background: #fff !important; }
+  .scope-card::before { height: 2px !important; }
+  .sc-eyebrow { font-size: 6pt; }
+  .sc-title { font-size: 8.5pt; }
+  .sc-desc { font-size: 7.5pt; }
+  .sc-total { font-size: 16pt; margin-top: 0.5rem; }
+  .s1 .sc-total { color: #0F7B5E !important; }
+  .s2 .sc-total { color: #2DBE6C !important; }
+  .s3 .sc-total { color: #8DC63F !important; }
+  .sc-total-unit { font-size: 6pt; }
 
-  /* Always show body in print regardless of open/closed */
-  .sec-bd { display: block !important; }
+  .acc { border-color: #E0E0E0 !important; margin-bottom: 1px; box-shadow: none; page-break-inside: avoid; }
+  .acc:first-of-type, .acc:last-of-type { border-radius: 0; }
+  .acc:last-of-type { margin-bottom: 1rem; }
+  .acc-hd { padding: 0.7rem 1.1rem; background: #fff !important; }
+  .s1 .acc-hd { border-left-color: #0F7B5E !important; }
+  .s2 .acc-hd { border-left-color: #2DBE6C !important; }
+  .s3 .acc-hd { border-left-color: #8DC63F !important; }
+  .s1 .acc-badge { background: rgba(15,123,94,0.09) !important; color: #0F7B5E !important; }
+  .s2 .acc-badge { background: rgba(45,190,108,0.09) !important; color: #2DBE6C !important; }
+  .s3 .acc-badge { background: rgba(141,198,63,0.10) !important; color: #7ab32e !important; }
+  .acc-meta h2 { font-size: 9pt; }
+  .acc-meta p  { font-size: 7pt; }
+  .acc-fig { font-size: 13pt; }
+  .s1 .acc-fig { color: #0F7B5E !important; } .s2 .acc-fig { color: #2DBE6C !important; } .s3 .acc-fig { color: #7ab32e !important; }
 
-  /* ── Print Input Rows ── */
-  /* Hide interactive inputs; show print-only value cells */
+  .acc-bd { display: block !important; border-top-color: #E0E0E0 !important; }
+
+  /* Hide inputs; show print cells */
   .ri, .rr { display: none !important; }
   .p-only { display: block !important; }
 
@@ -300,268 +561,289 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
     display: flex !important;
     justify-content: space-between;
     align-items: center;
-    padding: .45rem 1rem;
+    padding: 0.4rem 1.1rem;
     gap: 0;
-    border-bottom: 1px solid rgba(0,0,0,.05) !important;
+    border-bottom: 1px solid #F2F2F2 !important;
   }
   .irow:last-child { border-bottom: none !important; }
-  .rl-name { font-size: 8pt; color: #222 !important; }
-  .rl-hint { font-size: 6.5pt; color: #888 !important; }
+  .rl-name { font-size: 8pt; color: #1D1D1B !important; }
+  .rl-hint { font-size: 6.5pt; color: #9E9E9E !important; }
+  .p-entered { font-family: 'Source Code Pro', monospace; font-size: 7.5pt; color: #616161 !important; padding-left: 0.75rem; white-space: nowrap; }
+  .p-result  { font-family: 'Source Code Pro', monospace; font-size: 7.5pt; font-weight: 600; padding-left: 0.75rem; white-space: nowrap; min-width: 80px; text-align: right; }
+  .p-result.c1 { color: #0F7B5E !important; } .p-result.c2 { color: #2DBE6C !important; } .p-result.c3 { color: #7ab32e !important; }
+  .p-result.zero { color: #9E9E9E !important; }
 
-  .p-entered { font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; color: #444 !important; text-align: right; white-space: nowrap; padding-left: .75rem; }
-  .p-result  { font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; font-weight: 600; text-align: right; white-space: nowrap; padding-left: .75rem; min-width: 80px; }
-  .p-result.c1 { color: #1a7a52 !important; } .p-result.c2 { color: #1565a0 !important; } .p-result.c3 { color: #6b21a8 !important; }
-  .p-result.zero { color: #aaa !important; }
+  .dist { border-color: #E0E0E0 !important; padding: 1rem 1.1rem; margin-bottom: 1rem; box-shadow: none; page-break-inside: avoid; }
+  .dist-lbl { font-size: 6pt; }
+  .dtrack { height: 6px; background: #E0E0E0 !important; }
+  .dseg.s1 { background: #0F7B5E !important; } .dseg.s2 { background: #2DBE6C !important; } .dseg.s3 { background: #8DC63F !important; }
+  .ddot.s1 { background: #0F7B5E !important; } .ddot.s2 { background: #2DBE6C !important; } .ddot.s3 { background: #8DC63F !important; }
+  #pct-s1 { color: #0F7B5E !important; } #pct-s2 { color: #2DBE6C !important; } #pct-s3 { color: #7ab32e !important; }
+  .di { font-size: 7.5pt; }
 
-  /* ── Print Distribution Bar ── */
-  .dist { margin: 1rem 0; page-break-inside: avoid; }
-  .dl { font-size: 6.5pt; color: #888 !important; margin-bottom: .4rem; }
-  .dtrack { height: 7px; background: #e8e8e8 !important; border-radius: 4px; }
-  .dseg.s1 { background: #1a7a52 !important; } .dseg.s2 { background: #1565a0 !important; } .dseg.s3 { background: #6b21a8 !important; }
-  .dleg { gap: 1.5rem; margin-top: .5rem; }
-  .di { font-size: 7.5pt; color: #555 !important; }
-  .ddot.s1 { background: #1a7a52 !important; } .ddot.s2 { background: #1565a0 !important; } .ddot.s3 { background: #6b21a8 !important; }
-  #pct-s1 { color: #1a7a52 !important; } #pct-s2 { color: #1565a0 !important; } #pct-s3 { color: #6b21a8 !important; }
-
-  /* ── Print Footer ── */
   .p-footer {
     display: block !important;
-    margin-top: 1.5rem;
-    padding-top: .9rem;
-    border-top: 1px solid rgba(0,0,0,.12);
-    font-size: 7pt;
-    color: #888 !important;
-    line-height: 1.6;
+    margin-top: 1.5rem; padding-top: 0.9rem;
+    border-top: 1px solid #E0E0E0;
+    font-size: 7pt; color: #9E9E9E !important; line-height: 1.6;
   }
-  .p-footer strong { color: #444 !important; }
+  .p-footer strong { color: #616161 !important; }
 }
 </style>
 </head>
 <body>
 
-<div class="amb">
-  <div class="orb o1"></div>
-  <div class="orb o2"></div>
-  <div class="orb o3"></div>
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="ev-mark">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 3C8.477 3 4 7.477 4 13c0 3.5 1.733 6.6 4.4 8.5L14 25l5.6-3.5C22.267 19.6 24 16.5 24 13c0-5.523-4.477-10-10-10z" fill="rgba(45,190,108,0.15)" stroke="#2DBE6C" stroke-width="1.5"/>
+        <path d="M10 13c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4" stroke="#2DBE6C" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="14" cy="13" r="1.5" fill="#8DC63F"/>
+      </svg>
+    </div>
+    <span class="nav-brand">Evronai</span>
+    <div class="nav-divider"></div>
+    <span class="nav-title">ESG Carbon Calculator</span>
+  </div>
+  <div class="nav-right">GHG Protocol Aligned</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Sustainability Intelligence Platform</div>
+      <h1>ESG Carbon<br><strong>Footprint Calculator</strong></h1>
+      <p class="hero-sub">Scope 1, 2 &amp; 3 emissions measurement for small and medium businesses. Aligned with the GHG Protocol Corporate Standard and UK Government conversion factors.</p>
+    </div>
+    <div class="hero-total">
+      <div class="ht-label">Total Annual Footprint</div>
+      <div class="ht-number" id="total-big">0.0</div>
+      <div class="ht-unit">tCO2e / year</div>
+      <div class="ht-badge" id="rating">No data entered</div>
+    </div>
+  </div>
 </div>
 
-<div class="shell">
+<!-- MAIN -->
+<div class="content">
 
-  <!-- HEADER -->
-  <header class="hdr">
-    <div>
-      <div class="wm">
-        <div class="wm-icon">🌿</div>
-        <span class="wm-txt">Carbon Intelligence</span>
-      </div>
-      <h1>Measure Your<br><em>Carbon Footprint</em></h1>
-      <p class="hdr-sub">A Scope 1, 2 &amp; 3 emissions calculator for small and medium businesses. Enter your annual activity data to quantify your environmental impact.</p>
+  <!-- SCOPE SUMMARY CARDS -->
+  <div class="scope-cards">
+    <div class="scope-card s1">
+      <div class="sc-eyebrow">Scope 1</div>
+      <div class="sc-title">Direct Emissions</div>
+      <div class="sc-desc">Fuel combustion, company vehicles, on-site processes</div>
+      <div class="sc-total" id="pill-s1">0.0<span class="sc-total-unit"> tCO2e</span></div>
     </div>
-    <div>
-      <div class="tc-lbl">Total Footprint</div>
-      <div class="tc-num" id="total-big">0.0</div>
-      <div class="tc-unit">tCO&#x2082;e / year</div>
-      <div class="tc-rate" id="rating">No data entered</div>
+    <div class="scope-card s2">
+      <div class="sc-eyebrow">Scope 2</div>
+      <div class="sc-title">Purchased Energy</div>
+      <div class="sc-desc">Grid electricity, district heating, steam</div>
+      <div class="sc-total" id="pill-s2">0.0<span class="sc-total-unit"> tCO2e</span></div>
     </div>
-  </header>
-
-  <!-- SCOPE PILLS -->
-  <div class="pills">
-    <div class="pill s1">
-      <div class="ptag">Scope 1</div>
-      <div class="pname">Direct Emissions</div>
-      <div class="pdesc">Fuel you burn, vehicles you own, on-site processes</div>
-      <div class="ptot" id="pill-s1">0.0 <span class="punit">tCO&#x2082;e</span></div>
-    </div>
-    <div class="pill s2">
-      <div class="ptag">Scope 2</div>
-      <div class="pname">Purchased Energy</div>
-      <div class="pdesc">Electricity &amp; heat bought from external providers</div>
-      <div class="ptot" id="pill-s2">0.0 <span class="punit">tCO&#x2082;e</span></div>
-    </div>
-    <div class="pill s3">
-      <div class="ptag">Scope 3</div>
-      <div class="pname">Value Chain</div>
-      <div class="pdesc">Supply chain, travel, freight, waste &amp; more</div>
-      <div class="ptot" id="pill-s3">0.0 <span class="punit">tCO&#x2082;e</span></div>
+    <div class="scope-card s3">
+      <div class="sc-eyebrow">Scope 3</div>
+      <div class="sc-title">Value Chain</div>
+      <div class="sc-desc">Travel, freight, supply chain, waste, commuting</div>
+      <div class="sc-total" id="pill-s3">0.0<span class="sc-total-unit"> tCO2e</span></div>
     </div>
   </div>
 
   <!-- SCOPE 1 -->
-  <div class="sec s1 open" id="sec1">
-    <div class="sec-hd" onclick="tog('sec1')">
-      <div class="sico">S1</div>
-      <div class="smet"><h2>Scope 1 — Direct Emissions</h2><p>Combustion, company fleet, refrigerant leaks</p></div>
-      <div class="sfig"><span id="fig-s1">0.0</span><span class="sfig-u">tCO&#x2082;e</span></div>
-      <div class="chev">&#9662;</div>
+  <div class="acc s1 open" id="sec1">
+    <div class="acc-hd" onclick="tog('sec1')">
+      <div class="acc-badge">S1</div>
+      <div class="acc-meta"><h2>Scope 1 &mdash; Direct Emissions</h2><p>Combustion, fleet, refrigerants</p></div>
+      <div class="acc-fig"><span id="fig-s1">0.0</span><span class="acc-fig-u">tCO2e</span></div>
+      <div class="acc-chev">&#9662;</div>
     </div>
-    <div class="sec-bd">
-      <div class="irow" data-id="s1_gas" data-sc="c1">
-        <div><div class="rl-name">Natural Gas</div><div class="rl-hint">Heating, cooking, hot water — from your gas bill</div></div>
-        <div class="ri"><input type="number" id="s1_gas" placeholder="0" min="0" oninput="calc()"><div class="ru">m&#xB3;&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s1_gas">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s1_gas">—</span><span class="p-result c1 zero" id="pr_s1_gas">—</span></div>
+    <div class="acc-bd">
+      <div class="irow" data-id="s1_gas">
+        <div><div class="rl-name">Natural Gas</div><div class="rl-hint">Heating, cooking, hot water &mdash; from your gas bill</div></div>
+        <div class="ri"><input type="number" id="s1_gas" placeholder="0" min="0" oninput="calc()"><div class="ru">m3 / yr</div></div>
+        <div class="rr" id="r_s1_gas">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s1_gas">--</span><span class="p-result c1 zero" id="pr_s1_gas">--</span></div>
       </div>
-      <div class="irow" data-id="s1_diesel" data-sc="c1">
-        <div><div class="rl-name">Diesel — Company Vehicles</div><div class="rl-hint">Litres for owned or leased diesel fleet</div></div>
-        <div class="ri"><input type="number" id="s1_diesel" placeholder="0" min="0" oninput="calc()"><div class="ru">litres&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s1_diesel">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s1_diesel">—</span><span class="p-result c1 zero" id="pr_s1_diesel">—</span></div>
+      <div class="irow" data-id="s1_diesel">
+        <div><div class="rl-name">Diesel &mdash; Company Vehicles</div><div class="rl-hint">Litres purchased for owned or leased diesel fleet</div></div>
+        <div class="ri"><input type="number" id="s1_diesel" placeholder="0" min="0" oninput="calc()"><div class="ru">litres / yr</div></div>
+        <div class="rr" id="r_s1_diesel">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s1_diesel">--</span><span class="p-result c1 zero" id="pr_s1_diesel">--</span></div>
       </div>
-      <div class="irow" data-id="s1_petrol" data-sc="c1">
-        <div><div class="rl-name">Petrol — Company Vehicles</div><div class="rl-hint">Litres for owned or leased petrol fleet</div></div>
-        <div class="ri"><input type="number" id="s1_petrol" placeholder="0" min="0" oninput="calc()"><div class="ru">litres&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s1_petrol">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s1_petrol">—</span><span class="p-result c1 zero" id="pr_s1_petrol">—</span></div>
+      <div class="irow" data-id="s1_petrol">
+        <div><div class="rl-name">Petrol &mdash; Company Vehicles</div><div class="rl-hint">Litres purchased for owned or leased petrol fleet</div></div>
+        <div class="ri"><input type="number" id="s1_petrol" placeholder="0" min="0" oninput="calc()"><div class="ru">litres / yr</div></div>
+        <div class="rr" id="r_s1_petrol">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s1_petrol">--</span><span class="p-result c1 zero" id="pr_s1_petrol">--</span></div>
       </div>
-      <div class="irow" data-id="s1_lpg" data-sc="c1">
+      <div class="irow" data-id="s1_lpg">
         <div><div class="rl-name">LPG / Propane</div><div class="rl-hint">Cooking, heating or industrial processes</div></div>
-        <div class="ri"><input type="number" id="s1_lpg" placeholder="0" min="0" oninput="calc()"><div class="ru">litres&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s1_lpg">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s1_lpg">—</span><span class="p-result c1 zero" id="pr_s1_lpg">—</span></div>
+        <div class="ri"><input type="number" id="s1_lpg" placeholder="0" min="0" oninput="calc()"><div class="ru">litres / yr</div></div>
+        <div class="rr" id="r_s1_lpg">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s1_lpg">--</span><span class="p-result c1 zero" id="pr_s1_lpg">--</span></div>
       </div>
-      <div class="irow" data-id="s1_refrig" data-sc="c1">
-        <div><div class="rl-name">Refrigerant Top-up (R-410A)</div><div class="rl-hint">Leaked or replaced refrigerant from AC / cold storage</div></div>
-        <div class="ri"><input type="number" id="s1_refrig" placeholder="0" min="0" oninput="calc()"><div class="ru">kg&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s1_refrig">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s1_refrig">—</span><span class="p-result c1 zero" id="pr_s1_refrig">—</span></div>
+      <div class="irow" data-id="s1_refrig">
+        <div><div class="rl-name">Refrigerant Top-up (R-410A)</div><div class="rl-hint">Leaked or replaced refrigerant &mdash; AC units, cold storage</div></div>
+        <div class="ri"><input type="number" id="s1_refrig" placeholder="0" min="0" oninput="calc()"><div class="ru">kg / yr</div></div>
+        <div class="rr" id="r_s1_refrig">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s1_refrig">--</span><span class="p-result c1 zero" id="pr_s1_refrig">--</span></div>
       </div>
     </div>
   </div>
 
   <!-- SCOPE 2 -->
-  <div class="sec s2 open" id="sec2">
-    <div class="sec-hd" onclick="tog('sec2')">
-      <div class="sico">S2</div>
-      <div class="smet"><h2>Scope 2 — Purchased Energy</h2><p>Grid electricity, district heating, steam</p></div>
-      <div class="sfig"><span id="fig-s2">0.0</span><span class="sfig-u">tCO&#x2082;e</span></div>
-      <div class="chev">&#9662;</div>
+  <div class="acc s2 open" id="sec2">
+    <div class="acc-hd" onclick="tog('sec2')">
+      <div class="acc-badge">S2</div>
+      <div class="acc-meta"><h2>Scope 2 &mdash; Purchased Energy</h2><p>Grid electricity, district heating, steam</p></div>
+      <div class="acc-fig"><span id="fig-s2">0.0</span><span class="acc-fig-u">tCO2e</span></div>
+      <div class="acc-chev">&#9662;</div>
     </div>
-    <div class="sec-bd">
-      <div class="irow" data-id="s2_elec" data-sc="c2">
+    <div class="acc-bd">
+      <div class="irow" data-id="s2_elec">
         <div><div class="rl-name">Electricity Consumed</div><div class="rl-hint">Total kWh from your electricity bill(s)</div></div>
-        <div class="ri"><input type="number" id="s2_elec" placeholder="0" min="0" oninput="calc()"><div class="ru">kWh&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s2_elec">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s2_elec">—</span><span class="p-result c2 zero" id="pr_s2_elec">—</span></div>
+        <div class="ri"><input type="number" id="s2_elec" placeholder="0" min="0" oninput="calc()"><div class="ru">kWh / yr</div></div>
+        <div class="rr" id="r_s2_elec">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s2_elec">--</span><span class="p-result c2 zero" id="pr_s2_elec">--</span></div>
       </div>
-      <div class="irow" data-id="s2_renew" data-sc="c2">
-        <div><div class="rl-name">Renewable Offset (solar / REGOs)</div><div class="rl-hint">kWh self-generated or certified renewable — deducted</div></div>
-        <div class="ri"><input type="number" id="s2_renew" placeholder="0" min="0" oninput="calc()"><div class="ru">kWh&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s2_renew">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s2_renew">—</span><span class="p-result c2 zero" id="pr_s2_renew">—</span></div>
+      <div class="irow" data-id="s2_renew">
+        <div><div class="rl-name">Renewable Offset (solar / REGOs)</div><div class="rl-hint">kWh self-generated or certified renewable &mdash; deducted</div></div>
+        <div class="ri"><input type="number" id="s2_renew" placeholder="0" min="0" oninput="calc()"><div class="ru">kWh / yr</div></div>
+        <div class="rr" id="r_s2_renew">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s2_renew">--</span><span class="p-result c2 zero" id="pr_s2_renew">--</span></div>
       </div>
-      <div class="irow" data-id="s2_heat" data-sc="c2">
+      <div class="irow" data-id="s2_heat">
         <div><div class="rl-name">District Heating / Steam</div><div class="rl-hint">Purchased heat from a centralised network</div></div>
-        <div class="ri"><input type="number" id="s2_heat" placeholder="0" min="0" oninput="calc()"><div class="ru">kWh&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s2_heat">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s2_heat">—</span><span class="p-result c2 zero" id="pr_s2_heat">—</span></div>
+        <div class="ri"><input type="number" id="s2_heat" placeholder="0" min="0" oninput="calc()"><div class="ru">kWh / yr</div></div>
+        <div class="rr" id="r_s2_heat">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s2_heat">--</span><span class="p-result c2 zero" id="pr_s2_heat">--</span></div>
       </div>
     </div>
   </div>
 
   <!-- SCOPE 3 -->
-  <div class="sec s3 open" id="sec3">
-    <div class="sec-hd" onclick="tog('sec3')">
-      <div class="sico">S3</div>
-      <div class="smet"><h2>Scope 3 — Value Chain Emissions</h2><p>Travel, freight, waste, supply chain, commuting</p></div>
-      <div class="sfig"><span id="fig-s3">0.0</span><span class="sfig-u">tCO&#x2082;e</span></div>
-      <div class="chev">&#9662;</div>
+  <div class="acc s3 open" id="sec3">
+    <div class="acc-hd" onclick="tog('sec3')">
+      <div class="acc-badge">S3</div>
+      <div class="acc-meta"><h2>Scope 3 &mdash; Value Chain Emissions</h2><p>Travel, freight, waste, supply chain, commuting</p></div>
+      <div class="acc-fig"><span id="fig-s3">0.0</span><span class="acc-fig-u">tCO2e</span></div>
+      <div class="acc-chev">&#9662;</div>
     </div>
-    <div class="sec-bd">
-      <div class="irow" data-id="s3_flight_s" data-sc="c3">
-        <div><div class="rl-name">Short-haul Flights</div><div class="rl-hint">Passenger km per year — under 3,700 km</div></div>
-        <div class="ri"><input type="number" id="s3_flight_s" placeholder="0" min="0" oninput="calc()"><div class="ru">pkm&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s3_flight_s">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s3_flight_s">—</span><span class="p-result c3 zero" id="pr_s3_flight_s">—</span></div>
+    <div class="acc-bd">
+      <div class="irow" data-id="s3_flight_s">
+        <div><div class="rl-name">Short-haul Flights</div><div class="rl-hint">Passenger km per year &mdash; under 3,700 km</div></div>
+        <div class="ri"><input type="number" id="s3_flight_s" placeholder="0" min="0" oninput="calc()"><div class="ru">pkm / yr</div></div>
+        <div class="rr" id="r_s3_flight_s">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s3_flight_s">--</span><span class="p-result c3 zero" id="pr_s3_flight_s">--</span></div>
       </div>
-      <div class="irow" data-id="s3_flight_l" data-sc="c3">
-        <div><div class="rl-name">Long-haul Flights</div><div class="rl-hint">Passenger km per year — over 3,700 km</div></div>
-        <div class="ri"><input type="number" id="s3_flight_l" placeholder="0" min="0" oninput="calc()"><div class="ru">pkm&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s3_flight_l">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s3_flight_l">—</span><span class="p-result c3 zero" id="pr_s3_flight_l">—</span></div>
+      <div class="irow" data-id="s3_flight_l">
+        <div><div class="rl-name">Long-haul Flights</div><div class="rl-hint">Passenger km per year &mdash; over 3,700 km</div></div>
+        <div class="ri"><input type="number" id="s3_flight_l" placeholder="0" min="0" oninput="calc()"><div class="ru">pkm / yr</div></div>
+        <div class="rr" id="r_s3_flight_l">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s3_flight_l">--</span><span class="p-result c3 zero" id="pr_s3_flight_l">--</span></div>
       </div>
-      <div class="irow" data-id="s3_commute" data-sc="c3">
+      <div class="irow" data-id="s3_commute">
         <div><div class="rl-name">Employee Commuting</div><div class="rl-hint">Total km driven by all staff per year</div></div>
-        <div class="ri"><input type="number" id="s3_commute" placeholder="0" min="0" oninput="calc()"><div class="ru">km&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s3_commute">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s3_commute">—</span><span class="p-result c3 zero" id="pr_s3_commute">—</span></div>
+        <div class="ri"><input type="number" id="s3_commute" placeholder="0" min="0" oninput="calc()"><div class="ru">km / yr</div></div>
+        <div class="rr" id="r_s3_commute">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s3_commute">--</span><span class="p-result c3 zero" id="pr_s3_commute">--</span></div>
       </div>
-      <div class="irow" data-id="s3_freight" data-sc="c3">
-        <div><div class="rl-name">Road Freight</div><div class="rl-hint">Tonne-km shipped (cargo weight &times; distance)</div></div>
-        <div class="ri"><input type="number" id="s3_freight" placeholder="0" min="0" oninput="calc()"><div class="ru">tkm&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s3_freight">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s3_freight">—</span><span class="p-result c3 zero" id="pr_s3_freight">—</span></div>
+      <div class="irow" data-id="s3_freight">
+        <div><div class="rl-name">Road Freight</div><div class="rl-hint">Tonne-km shipped (cargo weight x distance)</div></div>
+        <div class="ri"><input type="number" id="s3_freight" placeholder="0" min="0" oninput="calc()"><div class="ru">tkm / yr</div></div>
+        <div class="rr" id="r_s3_freight">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s3_freight">--</span><span class="p-result c3 zero" id="pr_s3_freight">--</span></div>
       </div>
-      <div class="irow" data-id="s3_waste" data-sc="c3">
+      <div class="irow" data-id="s3_waste">
         <div><div class="rl-name">Waste to Landfill</div><div class="rl-hint">Tonnes of general waste sent to landfill annually</div></div>
-        <div class="ri"><input type="number" id="s3_waste" placeholder="0" min="0" oninput="calc()"><div class="ru">t&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s3_waste">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s3_waste">—</span><span class="p-result c3 zero" id="pr_s3_waste">—</span></div>
+        <div class="ri"><input type="number" id="s3_waste" placeholder="0" min="0" oninput="calc()"><div class="ru">t / yr</div></div>
+        <div class="rr" id="r_s3_waste">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s3_waste">--</span><span class="p-result c3 zero" id="pr_s3_waste">--</span></div>
       </div>
-      <div class="irow" data-id="s3_hotel" data-sc="c3">
+      <div class="irow" data-id="s3_hotel">
         <div><div class="rl-name">Hotel Stays</div><div class="rl-hint">Total business accommodation nights across all staff</div></div>
-        <div class="ri"><input type="number" id="s3_hotel" placeholder="0" min="0" oninput="calc()"><div class="ru">nights&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s3_hotel">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s3_hotel">—</span><span class="p-result c3 zero" id="pr_s3_hotel">—</span></div>
+        <div class="ri"><input type="number" id="s3_hotel" placeholder="0" min="0" oninput="calc()"><div class="ru">nights / yr</div></div>
+        <div class="rr" id="r_s3_hotel">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s3_hotel">--</span><span class="p-result c3 zero" id="pr_s3_hotel">--</span></div>
       </div>
-      <div class="irow" data-id="s3_goods" data-sc="c3">
-        <div><div class="rl-name">Purchased Goods &amp; Services</div><div class="rl-hint">Annual spend on manufactured goods (spend-based)</div></div>
-        <div class="ri"><input type="number" id="s3_goods" placeholder="0" min="0" oninput="calc()"><div class="ru">&#xA3;k&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s3_goods">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s3_goods">—</span><span class="p-result c3 zero" id="pr_s3_goods">—</span></div>
+      <div class="irow" data-id="s3_goods">
+        <div><div class="rl-name">Purchased Goods &amp; Services</div><div class="rl-hint">Annual spend on manufactured goods (spend-based method)</div></div>
+        <div class="ri"><input type="number" id="s3_goods" placeholder="0" min="0" oninput="calc()"><div class="ru">GBPk / yr</div></div>
+        <div class="rr" id="r_s3_goods">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s3_goods">--</span><span class="p-result c3 zero" id="pr_s3_goods">--</span></div>
       </div>
-      <div class="irow" data-id="s3_water" data-sc="c3">
-        <div><div class="rl-name">Water Consumed</div><div class="rl-hint">m&#xB3; supplied and treated — from water bills</div></div>
-        <div class="ri"><input type="number" id="s3_water" placeholder="0" min="0" oninput="calc()"><div class="ru">m&#xB3;&nbsp;/&nbsp;yr</div></div>
-        <div class="rr" id="r_s3_water">—</div>
-        <div class="p-only"><span class="p-entered" id="pe_s3_water">—</span><span class="p-result c3 zero" id="pr_s3_water">—</span></div>
+      <div class="irow" data-id="s3_water">
+        <div><div class="rl-name">Water Consumed</div><div class="rl-hint">m3 supplied and treated &mdash; from water bills</div></div>
+        <div class="ri"><input type="number" id="s3_water" placeholder="0" min="0" oninput="calc()"><div class="ru">m3 / yr</div></div>
+        <div class="rr" id="r_s3_water">--</div>
+        <div class="p-only"><span class="p-entered" id="pe_s3_water">--</span><span class="p-result c3 zero" id="pr_s3_water">--</span></div>
       </div>
     </div>
   </div>
 
-  <!-- DISTRIBUTION BAR -->
+  <!-- DISTRIBUTION -->
   <div class="dist">
-    <div class="dl">Emissions Distribution</div>
+    <div class="dist-lbl">Emissions Distribution</div>
     <div class="dtrack">
       <div class="dseg s1" id="bar-s1" style="width:0%"></div>
       <div class="dseg s2" id="bar-s2" style="width:0%"></div>
       <div class="dseg s3" id="bar-s3" style="width:0%"></div>
     </div>
     <div class="dleg">
-      <div class="di"><div class="ddot s1"></div><span>Scope 1</span>&nbsp;<span class="dpct" id="pct-s1" style="color:var(--s1)">0%</span></div>
-      <div class="di"><div class="ddot s2"></div><span>Scope 2</span>&nbsp;<span class="dpct" id="pct-s2" style="color:var(--s2)">0%</span></div>
-      <div class="di"><div class="ddot s3"></div><span>Scope 3</span>&nbsp;<span class="dpct" id="pct-s3" style="color:var(--s3)">0%</span></div>
+      <div class="di"><div class="ddot s1"></div><span>Scope 1</span>&nbsp;<span class="dpct" id="pct-s1">0%</span></div>
+      <div class="di"><div class="ddot s2"></div><span>Scope 2</span>&nbsp;<span class="dpct" id="pct-s2">0%</span></div>
+      <div class="di"><div class="ddot s3"></div><span>Scope 3</span>&nbsp;<span class="dpct" id="pct-s3">0%</span></div>
     </div>
   </div>
 
-  <!-- BUTTONS -->
+  <!-- ACTIONS -->
   <div class="acts">
-    <button class="btn btn-p" onclick="showReport()">&#x2197; Generate Report</button>
-    <button class="btn btn-s" onclick="doPrint()">&#x2193; Download PDF</button>
-    <button class="btn btn-s" onclick="resetAll()">&#x21BA; Reset All</button>
+    <button class="btn btn-primary" onclick="showReport()">View Summary Report</button>
+    <button class="btn btn-secondary" onclick="doPrint()">Download PDF</button>
+    <button class="btn btn-ghost" onclick="resetAll()">Reset All</button>
   </div>
 
   <!-- DISCLAIMER -->
   <div class="disc">
-    <div class="disc-ico">&#x2139;</div>
-    <p>Results are estimates using <strong>UK Government GHG Conversion Factors</strong> and <strong>IPCC AR6 GWP values</strong>. UK grid electricity factor: 0.233 kgCO&#x2082;e/kWh. For formal ESG disclosure, CDP or CSRD compliance, engage a certified sustainability consultant and use verified emission factors.</p>
+    <div>
+      <strong>Methodology note:</strong> Results are estimates using <strong>UK Government GHG Conversion Factors (2023)</strong> and <strong>IPCC AR6 GWP values</strong>.
+      UK grid electricity factor: 0.233 kgCO2e/kWh. For formal ESG disclosure, CDP submission or CSRD compliance,
+      Evronai recommends engaging a certified sustainability consultant and using verified, sector-specific emission factors.
+    </div>
   </div>
 
-  <!-- PRINT-ONLY FOOTER (hidden on screen) -->
-  <div class="p-footer" style="display:none">
-    <strong>Methodology:</strong> Emission factors from the UK Government GHG Conversion Factor repository (2023) and IPCC AR6 GWP values.
-    UK grid: 0.233 kgCO2e/kWh. R-410A GWP: 2,088. Scope 3 spend-based estimates use EXIOBASE sector averages.
-    For formal ESG disclosure or CSRD compliance, third-party verification is recommended.
-    &nbsp;&middot;&nbsp; Carbon Intelligence &nbsp;&middot;&nbsp; <span id="p-date"></span>
+  <!-- PRINT FOOTER -->
+  <div class="p-footer">
+    <strong>Evronai Sustainability Intelligence</strong> &nbsp;&middot;&nbsp;
+    Emission factors: UK Government GHG Conversion Factors (2023), IPCC AR6 GWP values. UK grid: 0.233 kgCO2e/kWh.
+    R-410A GWP: 2,088. Scope 3 spend-based estimates use EXIOBASE sector averages.
+    For formal ESG or CSRD reporting, third-party verification is recommended.
+    &nbsp;&middot;&nbsp; Generated: <span id="p-date"></span>
   </div>
 
-</div><!-- /shell -->
+</div>
 
-<!-- REPORT MODAL -->
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-left">
+    <svg width="22" height="22" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14 3C8.477 3 4 7.477 4 13c0 3.5 1.733 6.6 4.4 8.5L14 25l5.6-3.5C22.267 19.6 24 16.5 24 13c0-5.523-4.477-10-10-10z" fill="rgba(45,190,108,0.2)" stroke="#2DBE6C" stroke-width="1.5"/>
+      <path d="M10 13c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4" stroke="#2DBE6C" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="14" cy="13" r="1.5" fill="#8DC63F"/>
+    </svg>
+    <p><strong>Evronai</strong> &nbsp;&middot;&nbsp; Sustainability Intelligence &nbsp;&middot;&nbsp; ESG Carbon Calculator</p>
+  </div>
+  <p style="font-size:0.68rem;color:rgba(255,255,255,0.25)">GHG Protocol Corporate Standard Aligned</p>
+</footer>
+
+<!-- MODAL -->
 <div class="ovl" id="modal">
   <div class="modal">
     <div class="mhd">
-      <div><h2>Emissions <em>Summary Report</em></h2><p id="report-meta"></p></div>
+      <div><h2>ESG <span>Carbon Report</span></h2><p id="report-meta"></p></div>
       <button class="mclose" onclick="closeModal()">&#x2715;</button>
     </div>
     <div class="mbody" id="modal-body"></div>
@@ -569,59 +851,48 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 </div>
 
 <script>
-// -- Emission Factors (kg CO2e per unit) ----------------------
-const EF = {
-  s1_gas: 2.04, s1_diesel: 2.67, s1_petrol: 2.31, s1_lpg: 1.51, s1_refrig: 2088,
-  s2_elec: 0.233, s2_renew: 0.233, s2_heat: 0.18,
-  s3_flight_s: 0.255, s3_flight_l: 0.195, s3_commute: 0.14, s3_freight: 0.062,
-  s3_waste: 458, s3_hotel: 31.2, s3_goods: 350, s3_water: 0.344
+// Emission Factors (kg CO2e per unit)
+var EF = {
+  s1_gas:2.04, s1_diesel:2.67, s1_petrol:2.31, s1_lpg:1.51, s1_refrig:2088,
+  s2_elec:0.233, s2_renew:0.233, s2_heat:0.18,
+  s3_flight_s:0.255, s3_flight_l:0.195, s3_commute:0.14, s3_freight:0.062,
+  s3_waste:458, s3_hotel:31.2, s3_goods:350, s3_water:0.344
 };
-const LBL = {
+var LBL = {
   s1_gas:'Natural Gas', s1_diesel:'Diesel (fleet)', s1_petrol:'Petrol (fleet)',
   s1_lpg:'LPG/Propane', s1_refrig:'Refrigerants',
   s2_elec:'Grid Electricity', s2_renew:'Renewable Offset', s2_heat:'District Heating',
   s3_flight_s:'Short-haul Flights', s3_flight_l:'Long-haul Flights',
-  s3_commute:'Employee Commuting', s3_freight:'Road Freight', s3_waste:'Landfill Waste',
-  s3_hotel:'Hotel Stays', s3_goods:'Purchased Goods', s3_water:'Water'
+  s3_commute:'Employee Commuting', s3_freight:'Road Freight',
+  s3_waste:'Landfill Waste', s3_hotel:'Hotel Stays',
+  s3_goods:'Purchased Goods', s3_water:'Water'
 };
-const UNIT_LBL = {
+var ULBL = {
   s1_gas:'m3/yr', s1_diesel:'L/yr', s1_petrol:'L/yr', s1_lpg:'L/yr', s1_refrig:'kg/yr',
   s2_elec:'kWh/yr', s2_renew:'kWh/yr', s2_heat:'kWh/yr',
   s3_flight_s:'pkm/yr', s3_flight_l:'pkm/yr', s3_commute:'km/yr', s3_freight:'tkm/yr',
   s3_waste:'t/yr', s3_hotel:'nights/yr', s3_goods:'GBPk/yr', s3_water:'m3/yr'
 };
 
-let V = {}, T = { S1:0, S2:0, S3:0, TOTAL:0 };
+var V = {}, T = {S1:0,S2:0,S3:0,TOTAL:0};
 
-const gv = id => Math.max(0, parseFloat(document.getElementById(id)?.value) || 0);
-const fmt = n => n >= 100 ? n.toFixed(1) : n.toFixed(2);
-const fmtB = n => n >= 1000 ? (n/1000).toFixed(1)+'k' : n >= 100 ? n.toFixed(0) : n.toFixed(1);
+function gv(id) {
+  var el = document.getElementById(id);
+  return el ? Math.max(0, parseFloat(el.value) || 0) : 0;
+}
+function fmt(n) { return n >= 100 ? n.toFixed(1) : n.toFixed(2); }
+function fmtB(n) { return n >= 1000 ? (n/1000).toFixed(1)+'k' : n >= 100 ? n.toFixed(0) : n.toFixed(1); }
 
 function calc() {
-  V = {
-    s1_gas:     gv('s1_gas')     * EF.s1_gas     / 1000,
-    s1_diesel:  gv('s1_diesel')  * EF.s1_diesel  / 1000,
-    s1_petrol:  gv('s1_petrol')  * EF.s1_petrol  / 1000,
-    s1_lpg:     gv('s1_lpg')     * EF.s1_lpg     / 1000,
-    s1_refrig:  gv('s1_refrig')  * EF.s1_refrig  / 1000,
-    s2_elec:    gv('s2_elec')    * EF.s2_elec    / 1000,
-    s2_renew:   gv('s2_renew')   * EF.s2_renew   / 1000,
-    s2_heat:    gv('s2_heat')    * EF.s2_heat    / 1000,
-    s3_flight_s:gv('s3_flight_s')* EF.s3_flight_s/ 1000,
-    s3_flight_l:gv('s3_flight_l')* EF.s3_flight_l/ 1000,
-    s3_commute: gv('s3_commute') * EF.s3_commute / 1000,
-    s3_freight: gv('s3_freight') * EF.s3_freight / 1000,
-    s3_waste:   gv('s3_waste')   * EF.s3_waste   / 1000,
-    s3_hotel:   gv('s3_hotel')   * EF.s3_hotel   / 1000,
-    s3_goods:   gv('s3_goods')   * EF.s3_goods   / 1000,
-    s3_water:   gv('s3_water')   * EF.s3_water   / 1000
-  };
+  var keys = Object.keys(EF);
+  keys.forEach(function(k) {
+    V[k] = gv(k) * EF[k] / 1000;
+  });
 
-  // Update screen result cells
-  Object.keys(V).forEach(k => {
-    const el = document.getElementById('r_' + k);
+  keys.forEach(function(k) {
+    var el = document.getElementById('r_' + k);
     if (!el) return;
-    const val = k === 's2_renew' ? -V[k] : V[k];
+    var val = k === 's2_renew' ? -V[k] : V[k];
     if (Math.abs(val) > 0.0001) {
       el.textContent = (val < 0 ? '-' : '') + fmt(Math.abs(val)) + ' tCO2e';
       el.classList.add('on');
@@ -631,48 +902,44 @@ function calc() {
     }
   });
 
-  const S1 = V.s1_gas + V.s1_diesel + V.s1_petrol + V.s1_lpg + V.s1_refrig;
-  const S2 = Math.max(0, V.s2_elec - V.s2_renew + V.s2_heat);
-  const S3 = V.s3_flight_s + V.s3_flight_l + V.s3_commute + V.s3_freight +
-             V.s3_waste + V.s3_hotel + V.s3_goods + V.s3_water;
-  const TOTAL = S1 + S2 + S3;
-  T = { S1, S2, S3, TOTAL };
+  var S1 = V.s1_gas + V.s1_diesel + V.s1_petrol + V.s1_lpg + V.s1_refrig;
+  var S2 = Math.max(0, V.s2_elec - V.s2_renew + V.s2_heat);
+  var S3 = V.s3_flight_s + V.s3_flight_l + V.s3_commute + V.s3_freight +
+           V.s3_waste + V.s3_hotel + V.s3_goods + V.s3_water;
+  var TOTAL = S1 + S2 + S3;
+  T = {S1:S1, S2:S2, S3:S3, TOTAL:TOTAL};
 
-  // Scope pills + section figures
-  [['s1', S1], ['s2', S2], ['s3', S3]].forEach(([s, val]) => {
-    document.getElementById('fig-' + s).textContent = fmt(val);
-    document.getElementById('pill-' + s).innerHTML = fmtB(val) + ' <span class="punit">tCO&#x2082;e</span>';
-  });
+  document.getElementById('fig-s1').textContent = fmt(S1);
+  document.getElementById('fig-s2').textContent = fmt(S2);
+  document.getElementById('fig-s3').textContent = fmt(S3);
+  document.getElementById('pill-s1').innerHTML = fmtB(S1) + '<span class="sc-total-unit"> tCO2e</span>';
+  document.getElementById('pill-s2').innerHTML = fmtB(S2) + '<span class="sc-total-unit"> tCO2e</span>';
+  document.getElementById('pill-s3').innerHTML = fmtB(S3) + '<span class="sc-total-unit"> tCO2e</span>';
   document.getElementById('total-big').textContent = fmtB(TOTAL);
 
-  // Rating badge
-  const b = document.getElementById('rating');
-  const ratings = [
-    [0,    '#333',                     'var(--mut)', 'No data entered'],
-    [10,   'rgba(62,207,142,.15)',      'var(--s1)',  '* Excellent'],
-    [50,   'rgba(62,207,142,.1)',       'var(--s1)',  '^ Good'],
-    [150,  'rgba(201,168,76,.15)',      'var(--gold)','-> Moderate'],
-    [500,  'rgba(222,120,74,.15)',      '#DE784A',   'v High'],
-    [Infinity,'rgba(220,60,60,.15)',   '#DC3C3C',   '(!) Critical']
-  ];
-  for (let i = ratings.length - 1; i >= 0; i--) {
-    if (TOTAL >= (i === 0 ? 0 : ratings[i-1][0])) {
-      const [, bg, color, text] = ratings[i];
-      b.style.background = bg; b.style.color = color; b.textContent = text;
-      break;
-    }
+  var b = document.getElementById('rating');
+  if (TOTAL === 0) {
+    b.style.borderColor = 'rgba(255,255,255,0.15)'; b.style.color = 'rgba(255,255,255,0.5)'; b.textContent = 'No data entered';
+  } else if (TOTAL < 10) {
+    b.style.borderColor = '#3ECF8E'; b.style.color = '#3ECF8E'; b.textContent = 'Excellent';
+  } else if (TOTAL < 50) {
+    b.style.borderColor = '#3ECF8E'; b.style.color = '#3ECF8E'; b.textContent = 'Good';
+  } else if (TOTAL < 150) {
+    b.style.borderColor = '#FFB600'; b.style.color = '#FFB600'; b.textContent = 'Moderate';
+  } else if (TOTAL < 500) {
+    b.style.borderColor = '#E87722'; b.style.color = '#E87722'; b.textContent = 'High';
+  } else {
+    b.style.borderColor = '#D04A02'; b.style.color = '#D04A02'; b.textContent = 'Critical';
   }
-  if (TOTAL === 0) { b.style.background = '#333'; b.style.color = 'var(--mut)'; b.textContent = 'No data entered'; }
 
-  // Distribution bar
   if (TOTAL > 0) {
-    ['s1','s2','s3'].forEach((s,i) => {
-      const pct = [S1,S2,S3][i] / TOTAL * 100;
+    ['s1','s2','s3'].forEach(function(s, i) {
+      var pct = [S1,S2,S3][i] / TOTAL * 100;
       document.getElementById('bar-' + s).style.width = pct + '%';
       document.getElementById('pct-' + s).textContent = Math.round(pct) + '%';
     });
   } else {
-    ['s1','s2','s3'].forEach(s => {
+    ['s1','s2','s3'].forEach(function(s) {
       document.getElementById('bar-' + s).style.width = '0%';
       document.getElementById('pct-' + s).textContent = '0%';
     });
@@ -682,97 +949,84 @@ function calc() {
 function tog(id) { document.getElementById(id).classList.toggle('open'); }
 
 function resetAll() {
-  document.querySelectorAll('input[type="number"]').forEach(i => i.value = '');
+  document.querySelectorAll('input[type="number"]').forEach(function(i) { i.value = ''; });
   calc();
 }
 
-// -- PDF PRINT -------------------------------------------------
 function doPrint() {
-  // Ensure all sections open
-  ['sec1','sec2','sec3'].forEach(id => document.getElementById(id).classList.add('open'));
+  ['sec1','sec2','sec3'].forEach(function(id) { document.getElementById(id).classList.add('open'); });
 
-  // Populate print-only value cells
-  Object.keys(EF).forEach(k => {
-    const raw = gv(k);
-    const result = document.getElementById('r_' + k);
-    const pe = document.getElementById('pe_' + k);
-    const pr = document.getElementById('pr_' + k);
+  Object.keys(EF).forEach(function(k) {
+    var raw = gv(k);
+    var resEl = document.getElementById('r_' + k);
+    var pe = document.getElementById('pe_' + k);
+    var pr = document.getElementById('pr_' + k);
     if (!pe || !pr) return;
-
-    // Entered value
-    pe.textContent = raw > 0 ? (raw.toLocaleString() + ' ' + (UNIT_LBL[k] || '')) : '--';
-
-    // Calculated result
-    const resText = result ? result.textContent : '--';
+    pe.textContent = raw > 0 ? (raw.toLocaleString() + ' ' + (ULBL[k] || '')) : '--';
+    var resText = resEl ? resEl.textContent : '--';
     pr.textContent = resText;
-    if (resText === '--' || resText === '') {
-      pr.className = 'p-result zero ' + (pr.className.match(/c\d/)?.[0] || '');
-    } else {
-      pr.className = 'p-result ' + (pr.className.match(/c\d/)?.[0] || '');
-    }
+    var sc = pr.className.match(/c\d/);
+    pr.className = 'p-result ' + (sc ? sc[0] : '') + (resText === '--' ? ' zero' : '');
   });
 
-  // Set print date
-  const pd = document.getElementById('p-date');
-  if (pd) pd.textContent = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  var pd = document.getElementById('p-date');
+  if (pd) pd.textContent = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
 
-  setTimeout(() => window.print(), 80);
+  setTimeout(function() { window.print(); }, 80);
 }
-// -------------------------------------------------------------
 
-// -- REPORT MODAL ----------------------------------------------
 function showReport() {
-  const { S1, S2, S3, TOTAL } = T;
-  const date = new Date().toLocaleDateString('en-GB', { year:'numeric', month:'long', day:'numeric' });
+  var S1 = T.S1, S2 = T.S2, S3 = T.S3, TOTAL = T.TOTAL;
+  var date = new Date().toLocaleDateString('en-GB', {year:'numeric', month:'long', day:'numeric'});
   document.getElementById('report-meta').textContent = 'Prepared ' + date;
 
-  const recs = [];
-  if (V.s1_gas > 1) recs.push({ s:'Scope 1 -- Energy', t:'Switch on-site heating to heat pumps or biomass boilers to eliminate natural gas combustion.' });
-  if (V.s1_diesel + V.s1_petrol > 1) recs.push({ s:'Scope 1 -- Fleet', t:'Transition company vehicles to EVs or hybrids to eliminate direct tailpipe emissions.' });
-  if (V.s1_refrig > 0.5) recs.push({ s:'Scope 1 -- Refrigerants', t:'Service AC and refrigeration units regularly to minimise refrigerant leaks; consider low-GWP alternatives.' });
-  if (V.s2_elec > 2) recs.push({ s:'Scope 2 -- Electricity', t:'Switch to a 100% renewable electricity tariff or install on-site solar panels with battery storage.' });
-  if (V.s3_flight_s + V.s3_flight_l > 1) recs.push({ s:'Scope 3 -- Travel', t:'Implement a travel policy favouring video conferencing; offset unavoidable flights through verified schemes (Gold Standard / VCS).' });
-  if (V.s3_commute > 2) recs.push({ s:'Scope 3 -- Commuting', t:'Offer hybrid working, subsidised public transport, or a cycle-to-work scheme to reduce staff commuting emissions.' });
-  if (V.s3_waste > 0.5) recs.push({ s:'Scope 3 -- Waste', t:'Introduce a recycling programme to divert waste from landfill; explore zero-waste suppliers and composting.' });
-  if (V.s3_goods > 2) recs.push({ s:'Scope 3 -- Supply Chain', t:'Engage key suppliers on decarbonisation targets; request carbon data and prefer lower-carbon alternatives.' });
-  if (recs.length === 0) recs.push({ s:'General', t:"Your footprint is minimal or incomplete. Continue to track annually and engage your supply chain to capture full Scope 3 data." });
+  var recs = [];
+  if (V.s1_gas > 1)                       recs.push({s:'Scope 1 -- Energy',      t:'Transition on-site heating to heat pumps or biomass boilers to eliminate natural gas combustion.'});
+  if (V.s1_diesel + V.s1_petrol > 1)      recs.push({s:'Scope 1 -- Fleet',       t:'Transition company vehicles to EVs or hybrids to eliminate direct tailpipe emissions from the fleet.'});
+  if (V.s1_refrig > 0.5)                  recs.push({s:'Scope 1 -- Refrigerants',t:'Service AC and refrigeration units regularly to minimise leaks; consider low-GWP refrigerant alternatives.'});
+  if (V.s2_elec > 2)                      recs.push({s:'Scope 2 -- Electricity',  t:'Switch to a 100% renewable electricity tariff or install on-site solar with battery storage.'});
+  if (V.s3_flight_s + V.s3_flight_l > 1) recs.push({s:'Scope 3 -- Travel',       t:'Implement a travel policy favouring video conferencing; offset unavoidable flights via Gold Standard or VCS.'});
+  if (V.s3_commute > 2)                   recs.push({s:'Scope 3 -- Commuting',    t:'Offer hybrid working, subsidised public transport, or a cycle-to-work scheme to reduce commuting emissions.'});
+  if (V.s3_waste > 0.5)                   recs.push({s:'Scope 3 -- Waste',        t:'Introduce a waste reduction and recycling programme to divert waste from landfill.'});
+  if (V.s3_goods > 2)                     recs.push({s:'Scope 3 -- Supply Chain', t:'Engage key suppliers on decarbonisation targets; request carbon data and prefer lower-carbon alternatives.'});
+  if (recs.length === 0) recs.push({s:'General', t:'Your footprint is minimal or data is incomplete. Continue to track annually and engage your supply chain to capture full Scope 3 data.'});
 
-  const rows = keys => keys
-    .filter(k => V[k] > 0.0001)
-    .map(k => `<div class="rline"><span class="rln">${LBL[k]}</span><span class="rlv">${fmt(V[k])} tCO&#x2082;e</span></div>`)
-    .join('') || `<div class="rline"><span class="rln" style="font-style:italic">No data entered</span><span class="rlv">--</span></div>`;
+  function rows(keys) {
+    var r = keys.filter(function(k) { return V[k] > 0.0001; })
+      .map(function(k) { return '<div class="rline"><span class="rln">' + LBL[k] + '</span><span class="rlv">' + fmt(V[k]) + ' tCO2e</span></div>'; })
+      .join('');
+    return r || '<div class="rline"><span class="rln" style="font-style:italic">No data entered</span><span class="rlv">--</span></div>';
+  }
 
-  const pct = n => TOTAL > 0 ? Math.round(n / TOTAL * 100) : 0;
+  function pct(n) { return TOTAL > 0 ? Math.round(n / TOTAL * 100) : 0; }
 
-  document.getElementById('modal-body').innerHTML = `
-    <div class="rblk">
-      <div class="rbtl">Emissions Overview</div>
-      <div class="sgrid">
-        <div class="scard tot"><div class="sc-lbl">Total Footprint</div><div class="sc-val">${fmt(TOTAL)}</div><div class="sc-unit">tCO&#x2082;e / year</div></div>
-        <div class="scard c1"><div class="sc-lbl">Scope 1 -- Direct</div><div class="sc-val">${fmt(S1)}</div><div class="sc-unit">${pct(S1)}% of total</div></div>
-        <div class="scard c2"><div class="sc-lbl">Scope 2 -- Energy</div><div class="sc-val">${fmt(S2)}</div><div class="sc-unit">${pct(S2)}% of total</div></div>
-        <div class="scard c3"><div class="sc-lbl">Scope 3 -- Value Chain</div><div class="sc-val">${fmt(S3)}</div><div class="sc-unit">${pct(S3)}% of total</div></div>
-      </div>
-    </div>
-    <div class="rblk"><div class="rbtl">Scope 1 Breakdown</div>${rows(['s1_gas','s1_diesel','s1_petrol','s1_lpg','s1_refrig'])}</div>
-    <div class="rblk"><div class="rbtl">Scope 2 Breakdown</div>${rows(['s2_elec','s2_renew','s2_heat'])}</div>
-    <div class="rblk"><div class="rbtl">Scope 3 Breakdown</div>${rows(['s3_flight_s','s3_flight_l','s3_commute','s3_freight','s3_waste','s3_hotel','s3_goods','s3_water'])}</div>
-    <div class="rblk"><div class="rbtl">Recommended Actions</div>
-      ${recs.map(r => `<div class="rec"><div class="rec-s">${r.s}</div><div class="rec-t">${r.t}</div></div>`).join('')}
-    </div>
-    <div class="rblk"><div class="rbtl">Methodology</div>
-      <div class="mnote">Emission factors from the <strong>UK Government GHG Conversion Factor repository (2023)</strong> and <strong>IPCC AR6 GWP values</strong>. UK grid: 0.233 kgCO&#x2082;e/kWh. R-410A GWP: 2,088. Scope 3 spend-based estimates use EXIOBASE averages. For formal ESG disclosure, CDP or CSRD compliance, third-party verification and sector-specific factors are recommended.</div>
-    </div>`;
+  document.getElementById('modal-body').innerHTML =
+    '<div class="rblk"><div class="rbtl">Emissions Overview</div>' +
+    '<div class="sgrid">' +
+    '<div class="scard tot"><div class="sc-lbl">Total Footprint</div><div class="sc-val">' + fmt(TOTAL) + '</div><div class="sc-unit">tCO2e / year</div></div>' +
+    '<div class="scard c1"><div class="sc-lbl">Scope 1 Direct</div><div class="sc-val">' + fmt(S1) + '</div><div class="sc-unit">' + pct(S1) + '% of total</div></div>' +
+    '<div class="scard c2"><div class="sc-lbl">Scope 2 Energy</div><div class="sc-val">' + fmt(S2) + '</div><div class="sc-unit">' + pct(S2) + '% of total</div></div>' +
+    '<div class="scard c3"><div class="sc-lbl">Scope 3 Value Chain</div><div class="sc-val">' + fmt(S3) + '</div><div class="sc-unit">' + pct(S3) + '% of total</div></div>' +
+    '</div></div>' +
+    '<div class="rblk"><div class="rbtl">Scope 1 Breakdown</div>' + rows(['s1_gas','s1_diesel','s1_petrol','s1_lpg','s1_refrig']) + '</div>' +
+    '<div class="rblk"><div class="rbtl">Scope 2 Breakdown</div>' + rows(['s2_elec','s2_renew','s2_heat']) + '</div>' +
+    '<div class="rblk"><div class="rbtl">Scope 3 Breakdown</div>' + rows(['s3_flight_s','s3_flight_l','s3_commute','s3_freight','s3_waste','s3_hotel','s3_goods','s3_water']) + '</div>' +
+    '<div class="rblk"><div class="rbtl">Recommended Actions</div>' +
+    recs.map(function(r) { return '<div class="rec"><div class="rec-s">' + r.s + '</div><div class="rec-t">' + r.t + '</div></div>'; }).join('') +
+    '</div>' +
+    '<div class="rblk"><div class="rbtl">Methodology</div>' +
+    '<div class="mnote">Emission factors from the <strong>UK Government GHG Conversion Factor repository (2023)</strong> and <strong>IPCC AR6 GWP values</strong>. ' +
+    'UK grid: 0.233 kgCO2e/kWh. R-410A GWP: 2,088. Scope 3 spend-based estimates use EXIOBASE averages. ' +
+    'For formal ESG disclosure, CDP or CSRD compliance, Evronai recommends third-party verification and sector-specific emission factors.</div></div>';
 
   document.getElementById('modal').classList.add('open');
 }
 
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
-document.getElementById('modal').addEventListener('click', e => {
+document.getElementById('modal').addEventListener('click', function(e) {
   if (e.target === document.getElementById('modal')) closeModal();
 });
 
-// Init
 calc();
 </script>
 </body>
